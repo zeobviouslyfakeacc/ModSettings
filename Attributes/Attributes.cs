@@ -86,8 +86,8 @@ namespace ModSettings {
 			}
 
 			if (choice != null) {
-				if (fieldType != typeof(int) && fieldType != typeof(float) && !fieldType.IsEnum)
-					throw new ArgumentException("[ModSettings] 'Choice' attribute can only be used on fields with int, float, or enum type", field.Name);
+				if (fieldType != typeof(int) && !fieldType.IsEnum)
+					throw new ArgumentException("[ModSettings] 'Choice' attribute can only be used on fields with int or enum type", field.Name);
 
 				if (choice.Names == null || choice.Names.Length == 0)
 					throw new ArgumentException("[ModSettings] 'Choice' attribute must contain non-empty array of non-empty strings", field.Name);
