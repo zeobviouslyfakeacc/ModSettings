@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{17C6EC09-2C53-4636-883C-9213E4300426}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ModSettings</RootNamespace>
+    <AssemblyName>ModSettings</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" />
+    <Reference Include="Harmony" />
+    <Reference Include="System" />
+    <Reference Include="UnityEngine.CoreModule" />
+    <Reference Include="UnityEngine.PhysicsModule" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\Attributes.cs" />
+    <Compile Include="Attributes\ChoiceAttribute.cs" />
+    <Compile Include="Attributes\DescriptionAttribute.cs" />
+    <Compile Include="Attributes\NameAttribute.cs" />
+    <Compile Include="Attributes\SectionAttribute.cs" />
+    <Compile Include="Attributes\SliderAttribute.cs" />
+    <Compile Include="CustomModeMenu.cs" />
+    <Compile Include="Example.cs" />
+    <Compile Include="GUI\CustomModeGUIBuilder.cs" />
+    <Compile Include="GUI\CustomModePatches.cs" />
+    <Compile Include="GUI\DescriptionHolder.cs" />
+    <Compile Include="GUI\Group.cs" />
+    <Compile Include="GUI\GUIBuilder.cs" />
+    <Compile Include="GUI\ModSettingsGUI.cs" />
+    <Compile Include="GUI\ModSettingsGUIBuilder.cs" />
+    <Compile Include="GUI\ModSettingsPatches.cs" />
+    <Compile Include="GUI\ModTab.cs" />
+    <Compile Include="MenuType.cs" />
+    <Compile Include="ModSettingsBase.cs" />
+    <Compile Include="ModSettingsMenu.cs" />
+    <Compile Include="Position.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
