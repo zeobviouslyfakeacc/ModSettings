@@ -39,19 +39,6 @@ namespace ModSettingsExample {
 		public int intSliderValue = 1;
 
 		/*
-		 * This method is called whenever a field in this object is changed.
-		 * The method is not marked abstract, so you don't have to override it if you don't need it.
-		 */
-		protected override void OnChange(FieldInfo field, object oldValue, object newValue) {
-			/*
-			 * By default, there is no confirm button in the mod settings panel.
-			 * If you need such a button, call the RequiresConfirmation method.
-			 * Pressing the confirm button will then call your OnConfirm method.
-			 */
-			RequiresConfirmation();
-		}
-
-		/*
 		 * This method is called whenever the user presses the confirm button in the
 		 * custom experience mode panel or in the mod settings panel.
 		 * You also don't need to override this method if you don't need it.
@@ -74,6 +61,10 @@ namespace ModSettingsExample {
 		[Slider(0, 7)]
 		public int visibleSettingsCount = 7;
 
+		/*
+		 * This method is called whenever a field in this object is changed.
+		 * The method is not marked abstract, so you don't have to override it if you don't need it.
+		 */
 		protected override void OnChange(FieldInfo field, object oldValue, object newValue) {
 			// We already know there's just one field, but let's be pretend we don't
 			if (field.Name == "visibleSettingsCount") {
