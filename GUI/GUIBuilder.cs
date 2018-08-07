@@ -76,6 +76,10 @@ namespace ModSettings {
 			}
 		}
 
+		protected virtual void SetSettingsField(ModSettingsBase modSettings, FieldInfo field, object newValue) {
+			modSettings.SetFieldValue(field, newValue);
+		}
+
 		private void AddHeader(SectionAttribute section) {
 			GameObject padding = NGUITools.AddChild(uiGrid.gameObject);
 			GameObject header = NGUITools.AddChild(uiGrid.gameObject);
@@ -100,20 +104,17 @@ namespace ModSettings {
 			ConsoleComboBox comboBox = setting.GetComponent<ConsoleComboBox>();
 
 			// Add listener and set default value
-			EventDelegate.Set(comboBox.onChange, () => UpdateBooleanValue(modSettings, field, comboBox));
-			bool defaultValue = (bool) field.GetValue(modSettings);
-			comboBox.value = comboBox.items[defaultValue ? 1 : 0];
+			EventDelegate.Set(comboBox.onChange, () => SetSettingsField(modSettings, field, (comboBox.GetCurrentIndex() == 1)));
+			modSettings.AddMenuVisibilityListener((visible) => UpdateYesNoComboBox(modSettings, field, comboBox, visible));
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
 		}
 
-		private static void UpdateBooleanValue(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox) {
-			bool oldValue = (bool) field.GetValue(modSettings);
-			bool newValue = (comboBox.GetCurrentIndex() == 1);
-			if (oldValue != newValue) {
-				field.SetValue(modSettings, newValue);
-				modSettings.CallOnChange(field, oldValue, newValue);
+		private static void UpdateYesNoComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox, bool visible) {
+			if (visible) {
+				bool value = (bool) field.GetValue(modSettings);
+				comboBox.value = comboBox.items[value ? 1 : 0];
 			}
 		}
 
@@ -128,20 +129,17 @@ namespace ModSettings {
 			comboBox.m_Localize = choice.Localize;
 
 			// Add listener and set default value
-			EventDelegate.Set(comboBox.onChange, () => UpdateChoiceValue(modSettings, field, comboBox));
-			int defaultValue = (int) field.GetValue(modSettings);
-			comboBox.value = comboBox.items[defaultValue];
+			EventDelegate.Set(comboBox.onChange, () => SetSettingsField(modSettings, field, comboBox.GetCurrentIndex()));
+			modSettings.AddMenuVisibilityListener((visible) => UpdateChoiceComboBox(modSettings, field, comboBox, visible));
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
 		}
 
-		private static void UpdateChoiceValue(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox) {
-			int oldValue = (int) field.GetValue(modSettings);
-			int newValue = comboBox.GetCurrentIndex();
-			if (oldValue != newValue) {
-				field.SetValue(modSettings, newValue);
-				modSettings.CallOnChange(field, oldValue, newValue);
+		private static void UpdateChoiceComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox, bool visible) {
+			if (visible) {
+				int value = (int) field.GetValue(modSettings);
+				comboBox.value = comboBox.items[value];
 			}
 		}
 
@@ -172,6 +170,7 @@ namespace ModSettings {
 			EventDelegate.Callback callback = () => UpdateSliderValue(modSettings, field, uiSlider, uiLabel, from, to, numberFormat);
 			EventDelegate.Set(slider.onChange, callback);
 			EventDelegate.Set(uiSlider.onChange, callback);
+			modSettings.AddMenuVisibilityListener((visible) => UpdateSlider(modSettings, field, uiSlider, uiLabel, from, to, numberFormat, visible));
 
 			// Set default value and number of steps
 			float defaultValue = Convert.ToSingle(field.GetValue(modSettings));
@@ -182,28 +181,40 @@ namespace ModSettings {
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
 		}
 
-		private static void UpdateSliderValue(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
+		private void UpdateSliderValue(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
+			float oldValue = Convert.ToSingle(field.GetValue(modSettings));
 			float sliderValue = from + slider.value * (to - from);
+			if (sliderValue == oldValue)
+				return;
 
 			if (field.FieldType == typeof(float)) {
-				float oldValue = (float) field.GetValue(modSettings);
-
-				label.text = string.Format(numberFormat, sliderValue);
-				if (oldValue != sliderValue) {
-					GameAudioManager.PlayGUISlider();
-					field.SetValue(modSettings, sliderValue);
-					modSettings.CallOnChange(field, oldValue, sliderValue);
-				}
+				SetSettingsField(modSettings, field, sliderValue);
 			} else {
 				int intValue = Mathf.RoundToInt(sliderValue);
-				int oldValue = (int) field.GetValue(modSettings);
+				SetSettingsField(modSettings, field, intValue);
+			}
 
+			UpdateSliderLabel(field, label, sliderValue, numberFormat);
+
+			if (modSettings.IsVisible()) {
+				GameAudioManager.PlayGUISlider();
+			}
+		}
+
+		private static void UpdateSlider(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat, bool visible) {
+			if (visible) {
+				float value = Convert.ToSingle(field.GetValue(modSettings));
+				slider.value = (value - from) / (to - from);
+				UpdateSliderLabel(field, label, value, numberFormat);
+			}
+		}
+
+		private static void UpdateSliderLabel(FieldInfo field, UILabel label, float value, string numberFormat) {
+			if (field.FieldType == typeof(float)) {
+				label.text = string.Format(numberFormat, value);
+			} else {
+				int intValue = Mathf.RoundToInt(value);
 				label.text = string.Format(numberFormat, intValue);
-				if (oldValue != intValue) {
-					GameAudioManager.PlayGUISlider();
-					field.SetValue(modSettings, intValue);
-					modSettings.CallOnChange(field, oldValue, intValue);
-				}
 			}
 		}
 

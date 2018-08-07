@@ -16,9 +16,7 @@ namespace ModSettings {
 		}
 
 		internal static void RegisterSettings(ModSettingsBase modSettings, Position targetPosition) {
-			if (modSettings == null) {
-				throw new ArgumentNullException("modSettings");
-			} else if (targetPosition == null) {
+			if (targetPosition == null) {
 				throw new ArgumentNullException("targetPosition");
 			} else if (settings.Contains(modSettings)) {
 				throw new ArgumentException("[ModSettings] Cannot add the same settings object multiple times", "modSettings");
@@ -50,15 +48,13 @@ namespace ModSettings {
 
 		internal static void SetSettingsVisible(bool enable) {
 			foreach (ModSettingsBase setting in settings) {
-				setting.OverrideVisible(enable);
+				setting.SetMenuVisible(enable);
 			}
 		}
 
 		internal static void CallOnConfirm() {
-			foreach (List<ModSettingsBase> settingsAtPosition in settingsAtPosition) {
-				foreach (ModSettingsBase settings in settingsAtPosition) {
-					settings.CallOnConfirm();
-				}
+			foreach (ModSettingsBase settings in settings) {
+				settings.CallOnConfirm();
 			}
 		}
 	}

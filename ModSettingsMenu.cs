@@ -8,16 +8,15 @@ namespace ModSettings {
 		private static readonly HashSet<ModSettingsBase> settings = new HashSet<ModSettingsBase>();
 		private static readonly SortedDictionary<string, List<ModSettingsBase>> settingsByModName = new SortedDictionary<string, List<ModSettingsBase>>();
 		private static readonly Dictionary<ModSettingsBase, MenuType> menuTypes = new Dictionary<ModSettingsBase, MenuType>();
-		private static bool guiBuilt = false;
 
-		public static void RegisterSettings(ModSettingsBase modSettings, string modName, MenuType menuType) {
-			if (modSettings == null) {
-				throw new ArgumentNullException("modSettings");
-			} else if (string.IsNullOrEmpty(modName)) {
+		private static ModSettingsGUI modSettingsGUI = null;
+
+		internal static void RegisterSettings(ModSettingsBase modSettings, string modName, MenuType menuType) {
+			if (string.IsNullOrEmpty(modName)) {
 				throw new ArgumentException("[ModSettings] Mod name must be a non-empty string", "modName");
 			} else if (settings.Contains(modSettings)) {
 				throw new ArgumentException("[ModSettings] Cannot add the same settings object multiple times", "modSettings");
-			} else if (guiBuilt) {
+			} else if (modSettingsGUI != null) {
 				throw new InvalidOperationException("[ModSettings] RegisterSettings called after the GUI has been built.\n"
 						+ "Call this method before Panel_CustomXPSetup::Awake, preferably from your mod's OnLoad method");
 			}
@@ -33,10 +32,8 @@ namespace ModSettings {
 		}
 
 		internal static void BuildGUI() {
-			guiBuilt = true;
-
 			GameObject modSettingsTab = ModSettingsGUIBuilder.CreateModSettingsTab();
-			ModSettingsGUI modSettingsGUI = modSettingsTab.AddComponent<ModSettingsGUI>();
+			modSettingsGUI = modSettingsTab.AddComponent<ModSettingsGUI>();
 
 			foreach (KeyValuePair<string, List<ModSettingsBase>> entry in settingsByModName) {
 				ModSettingsGUIBuilder guiBuilder = new ModSettingsGUIBuilder(entry.Key, modSettingsGUI);
@@ -48,19 +45,19 @@ namespace ModSettings {
 
 		internal static void SetSettingsVisible(MenuType menuType) {
 			foreach (KeyValuePair<ModSettingsBase, MenuType> entry in menuTypes) {
-				entry.Key.OverrideVisible(entry.Value == MenuType.Both || entry.Value == menuType);
+				entry.Key.SetMenuVisible(entry.Value == MenuType.Both || entry.Value == menuType);
 			}
 		}
 
 		internal static void SetAllSettingsInvisible() {
 			foreach (ModSettingsBase setting in menuTypes.Keys) {
-				setting.OverrideVisible(false);
+				setting.SetMenuVisible(false);
 			}
 		}
 
 		internal static bool HasVisibleModSettings() {
 			foreach (ModSettingsBase modSettings in settings) {
-				if (modSettings.IsVisible())
+				if (modSettings.IsUserVisible())
 					return true;
 			}
 			return false;

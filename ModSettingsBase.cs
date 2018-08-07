@@ -6,24 +6,36 @@ namespace ModSettings {
 	public abstract class ModSettingsBase {
 
 		private readonly FieldInfo[] fields;
+		private readonly Dictionary<FieldInfo, object> confirmedValues;
+
+		private readonly Visibility menuVisibility;
 		private readonly Visibility visibility;
 		private readonly Dictionary<FieldInfo, Visibility> fieldVisibilities;
 
 		protected ModSettingsBase() {
 			fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+			confirmedValues = new Dictionary<FieldInfo, object>(fields.Length);
 
-			fieldVisibilities = new Dictionary<FieldInfo, Visibility>(fields.Length);
-			foreach (FieldInfo field in fields) {
-				fieldVisibilities.Add(field, new Visibility());
-			}
-
-			visibility = new Visibility();
-			visibility.AddVisibilityListener((visible) => {
-				foreach (Visibility visibility in fieldVisibilities.Values) {
-					visibility.SetParentVisible(visible);
+			menuVisibility = new Visibility();
+			menuVisibility.SetVisible(false);
+			menuVisibility.AddVisibilityListener((visible) => {
+				// Reset public fields to last confirmed values when leaving settings menu
+				if (visible) {
+					foreach (FieldInfo field in fields) {
+						confirmedValues[field] = field.GetValue(this);
+					}
+				} else {
+					foreach (FieldInfo field in fields) {
+						SetFieldValue(field, confirmedValues[field]);
+					}
 				}
 			});
-			visibility.SetParentVisible(false);
+
+			visibility = new Visibility(menuVisibility);
+			fieldVisibilities = new Dictionary<FieldInfo, Visibility>(fields.Length);
+			foreach (FieldInfo field in fields) {
+				fieldVisibilities.Add(field, new Visibility(visibility));
+			}
 
 			Attributes.ValidateFields(this);
 		}
@@ -44,8 +56,8 @@ namespace ModSettings {
 			return visibility.IsVisible();
 		}
 
-		internal void OverrideVisible(bool visible) {
-			visibility.SetParentVisible(visible);
+		internal bool IsUserVisible() {
+			return visibility.IsSelfVisible();
 		}
 
 		public void SetVisible(bool visible) {
@@ -70,13 +82,33 @@ namespace ModSettings {
 			GetFieldVisibility(field).SetVisible(visible);
 		}
 
-		protected void RequiresConfirmation() {
-			InterfaceManager.m_Panel_OptionsMenu.SettingsNeedConfirmation();
+		internal void SetFieldValue(FieldInfo field, object newValue) {
+			object oldValue = field.GetValue(this);
+			if (oldValue != newValue) {
+				field.SetValue(this, newValue);
+				CallOnChange(field, oldValue, newValue);
+			}
 		}
+
+		[Obsolete("All settings now require confirmation by default. This method will be removed in the next version", true)]
+		protected void RequiresConfirmation() { }
 
 		protected virtual void OnConfirm() { }
 
 		protected virtual void OnChange(FieldInfo field, object oldValue, object newValue) { }
+
+		internal void CallOnConfirm() {
+			foreach (FieldInfo field in fields) {
+				confirmedValues[field] = field.GetValue(this);
+			}
+
+			try {
+				OnConfirm();
+			} catch (Exception e) {
+				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler");
+				UnityEngine.Debug.LogException(e);
+			}
+		}
 
 		internal void CallOnChange(FieldInfo field, object oldValue, object newValue) {
 			try {
@@ -87,16 +119,15 @@ namespace ModSettings {
 			}
 		}
 
-		internal void CallOnConfirm() {
-			try {
-				OnConfirm();
-			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler");
-				UnityEngine.Debug.LogException(e);
-			}
+		internal void SetMenuVisible(bool visible) {
+			menuVisibility.SetVisible(visible);
 		}
 
 		internal delegate void OnVisibilityChange(bool visible);
+
+		internal void AddMenuVisibilityListener(OnVisibilityChange listener) {
+			menuVisibility.AddVisibilityListener(listener);
+		}
 
 		internal void AddVisibilityListener(OnVisibilityChange listener) {
 			visibility.AddVisibilityListener(listener);
@@ -136,23 +167,38 @@ namespace ModSettings {
 		private class Visibility {
 
 			private readonly List<OnVisibilityChange> visibilityListeners = new List<OnVisibilityChange>();
+			private readonly List<Visibility> children = new List<Visibility>();
 			private bool parentVisible = true;
 			private bool visible = true;
+
+			internal Visibility() { }
+
+			internal Visibility(Visibility parent) {
+				parent.children.Add(this);
+				SetParentVisible(parent.IsVisible());
+			}
+
+			internal void AddChild(Visibility child) {
+				children.Add(child);
+				child.SetParentVisible(IsVisible());
+			}
+
+			internal bool IsSelfVisible() {
+				return visible;
+			}
 
 			internal bool IsVisible() {
 				return parentVisible && visible;
 			}
 
-			internal void SetParentVisible(bool parentVisible) {
+			private void SetParentVisible(bool parentVisible) {
 				if (this.parentVisible == parentVisible) {
 					return;
 				}
 
 				this.parentVisible = parentVisible;
 				if (visible) {
-					foreach (OnVisibilityChange listener in visibilityListeners) {
-						listener.Invoke(parentVisible);
-					}
+					ChangeVisibility(parentVisible);
 				}
 			}
 
@@ -163,9 +209,17 @@ namespace ModSettings {
 
 				this.visible = visible;
 				if (parentVisible) {
-					foreach (OnVisibilityChange listener in visibilityListeners) {
-						listener.Invoke(visible);
-					}
+					ChangeVisibility(visible);
+				}
+			}
+
+			private void ChangeVisibility(bool visible) {
+				foreach (Visibility child in children) {
+					child.SetParentVisible(visible);
+				}
+
+				foreach (OnVisibilityChange listener in visibilityListeners) {
+					listener.Invoke(visible);
 				}
 			}
 

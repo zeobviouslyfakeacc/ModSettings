@@ -86,7 +86,7 @@ namespace ModSettings {
 			slider.foregroundWidget.GetComponent<UISprite>().height = height;
 			scrollbar.transform.Find("glow").GetComponent<UISprite>().height = height + 44;
 
-			EventDelegate.Set(slider.onChange, () => OnScroll(slider));
+			EventDelegate.Set(slider.onChange, () => OnScroll(slider, true));
 
 			return scrollbar;
 		}
@@ -109,9 +109,11 @@ namespace ModSettings {
 			}
 		}
 
-		private void OnScroll(UISlider slider) {
+		private void OnScroll(UISlider slider, bool playSound) {
 			scrollPanelOffset.localPosition = new Vector2(0, slider.value * (currentTab?.scrollBarHeight ?? 0));
-			GameAudioManager.PlayGUIScroll();
+			if (playSound) {
+				GameAudioManager.PlayGUIScroll();
+			}
 		}
 
 		private void SelectMod(string modName) {
@@ -119,17 +121,14 @@ namespace ModSettings {
 				currentTab.uiGrid.gameObject.SetActive(false);
 			}
 
-			ResetNeedsConfirmation();
-
 			if (modTabs.TryGetValue(modName, out currentTab)) {
 				currentTab = modTabs[modName];
 				currentTab.uiGrid.gameObject.SetActive(true);
 
-				ResizeScrollBar(currentTab);
+				SetConfirmButtonVisible(currentTab.requiresConfirmation);
 
-				UpdateMenuNavigationGeneric();
+				ResizeScrollBar(currentTab);
 				EnsureSelectedSettingVisible();
-				UpdateDescriptionLabel();
 			}
 		}
 
@@ -178,18 +177,31 @@ namespace ModSettings {
 		}
 
 		internal void Enable(Panel_OptionsMenu parentMenu) {
-			MethodInfo method = typeof(Panel_OptionsMenu).GetMethod("OnTabCommon", bindingFlags);
+			bool inMainMenu = InterfaceManager.IsMainMenuActive();
+			MenuType menuType = inMainMenu ? MenuType.MainMenuOnly : MenuType.InGameOnly;
+			ModSettingsMenu.SetSettingsVisible(menuType);
 
-			if (currentTab != null) {
-				method.Invoke(parentMenu, new object[] { gameObject, currentTab.menuItems, currentTab.selectedIndex });
-			} else {
-				method.Invoke(parentMenu, new object[] { gameObject, new List<GameObject>(), -1 });
+			GameAudioManager.PlayGUIButtonClick();
+			MethodInfo method = typeof(Panel_OptionsMenu).GetMethod("SetTabActive", bindingFlags);
+			method.Invoke(parentMenu, new object[] { gameObject });
+		}
+
+		private void OnDisable() {
+			ModSettingsMenu.SetAllSettingsInvisible();
+
+			foreach (ModTab tab in modTabs.Values) {
+				tab.requiresConfirmation = false;
 			}
 		}
 
-		internal void ResetNeedsConfirmation() {
+		internal void SetSettingsNeedConfirmation(bool value) {
+			currentTab.requiresConfirmation = value;
+			SetConfirmButtonVisible(value);
+		}
+
+		private void SetConfirmButtonVisible(bool value) {
 			FieldInfo needConfirmation = typeof(Panel_OptionsMenu).GetField("m_SettingsNeedConfirmation", BindingFlags.NonPublic | BindingFlags.Instance);
-			needConfirmation.SetValue(InterfaceManager.m_Panel_OptionsMenu, false);
+			needConfirmation.SetValue(InterfaceManager.m_Panel_OptionsMenu, value);
 		}
 
 		internal void CallOnConfirm() {
@@ -251,7 +263,7 @@ namespace ModSettings {
 				thumbResizer.SetNumSteps((int) scrollPanel.height, (int) height);
 
 				scrollBarSlider.value = Mathf.Clamp01(absoluteVal / Mathf.Max(1, modTab.scrollBarHeight));
-				OnScroll(scrollBarSlider);
+				OnScroll(scrollBarSlider, false);
 			} else {
 				modTab.scrollBarHeight = childCount * GUIBuilder.gridCellHeight - scrollPanel.height;
 			}

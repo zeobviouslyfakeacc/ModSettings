@@ -27,24 +27,11 @@ namespace ModSettings {
 			}
 		}
 
-		[HarmonyPatch(typeof(Panel_OptionsMenu), "Enable", new Type[] { typeof(bool) })]
-		private static class SetSettingsEnabled {
-			private static void Prefix(bool enable) {
-				bool inMainMenu = InterfaceManager.IsMainMenuActive();
-				if (enable) {
-					MenuType menuType = inMainMenu ? MenuType.MainMenuOnly : MenuType.InGameOnly;
-					ModSettingsMenu.SetSettingsVisible(menuType);
-				} else {
-					ModSettingsMenu.SetAllSettingsInvisible();
-				}
-			}
-		}
-
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "Update", new Type[0])]
 		private static class DoModSettingsTabUpdate {
 			private static void Postfix(Panel_OptionsMenu __instance) {
-				ModSettingsGUI settings = GetModSettingsGUI(__instance);
-				if (!settings.gameObject.activeInHierarchy)
+				GameObject settingsTab = GetSettingsTab(__instance);
+				if (!settingsTab.activeInHierarchy)
 					return;
 
 				if (InputManager.GetEscapePressed()) {
@@ -69,7 +56,7 @@ namespace ModSettings {
 					return true;
 
 				GameAudioManager.PlayGuiConfirm();
-				gui.ResetNeedsConfirmation();
+				gui.SetSettingsNeedConfirmation(false);
 				gui.CallOnConfirm();
 
 				return false;

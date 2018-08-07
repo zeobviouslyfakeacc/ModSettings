@@ -10,6 +10,7 @@ namespace ModSettings {
 
 		internal int selectedIndex;
 		internal float scrollBarHeight;
+		internal bool requiresConfirmation;
 
 		internal ModTab(UIGrid uiGrid, List<GameObject> menuItems) {
 			this.uiGrid = uiGrid;

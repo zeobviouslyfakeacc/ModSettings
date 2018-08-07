@@ -27,12 +27,14 @@ namespace ModSettings {
 			return (List<GameObject>) AccessTools.Field(typeof(Panel_OptionsMenu), fieldName).GetValue(panel);
 		}
 
+		private readonly ModSettingsGUI settingsGUI;
 		private readonly MenuGroup menuGroup;
 		private readonly List<ModSettingsBase> tabSettings;
 
 		internal ModSettingsGUIBuilder(string modName, ModSettingsGUI settingsGUI) : this(modName, settingsGUI, settingsGUI.CreateModTab(modName)) { }
 
 		private ModSettingsGUIBuilder(string modName, ModSettingsGUI settingsGUI, ModTab modTab) : base(modTab.uiGrid, modTab.menuItems) {
+			this.settingsGUI = settingsGUI;
 			menuGroup = new MenuGroup(modName, settingsGUI);
 			tabSettings = modTab.modSettings;
 		}
@@ -45,6 +47,11 @@ namespace ModSettings {
 			modSettings.AddVisibilityListener((visible) => {
 				menuGroup.NotifyChildVisible(visible);
 			});
+		}
+
+		protected override void SetSettingsField(ModSettingsBase modSettings, FieldInfo field, object newValue) {
+			base.SetSettingsField(modSettings, field, newValue);
+			settingsGUI.SetSettingsNeedConfirmation(true);
 		}
 
 		private class MenuGroup : Group {
