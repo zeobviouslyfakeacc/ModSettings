@@ -58,7 +58,7 @@ namespace ModSettings {
 
 		[HarmonyPatch(typeof(Panel_CustomXPSetup), "OnContinue")]
 		private static class CustomGameStartedPatch {
-			private static void Postfix() {
+			private static void Prefix() {
 				CustomModeMenu.CallOnConfirm();
 			}
 		}

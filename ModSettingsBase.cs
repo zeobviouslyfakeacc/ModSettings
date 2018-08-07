@@ -52,6 +52,10 @@ namespace ModSettings {
 			ModSettingsMenu.RegisterSettings(this, modName, menuType);
 		}
 
+		internal void SetMenuVisible(bool visible) {
+			menuVisibility.SetVisible(visible);
+		}
+
 		public bool IsVisible() {
 			return visibility.IsVisible();
 		}
@@ -117,10 +121,6 @@ namespace ModSettings {
 				UnityEngine.Debug.LogError("[ModSettings] Exception in OnChange handler");
 				UnityEngine.Debug.LogException(e);
 			}
-		}
-
-		internal void SetMenuVisible(bool visible) {
-			menuVisibility.SetVisible(visible);
 		}
 
 		internal delegate void OnVisibilityChange(bool visible);
