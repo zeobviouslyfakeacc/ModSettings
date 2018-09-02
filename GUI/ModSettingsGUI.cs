@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEngine;
 
 namespace ModSettings {
-	public class ModSettingsGUI : MonoBehaviour {
+	internal class ModSettingsGUI : MonoBehaviour {
 
 		private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
 
