@@ -71,6 +71,10 @@ namespace ModSettings {
 					// It's a setting, add to tab list
 					menuItems.Add(element.gameObject);
 					element.parent = uiGrid.transform;
+
+					// Add visibility listener
+					var listener = element.gameObject.AddComponent<HinterlandSettingVisibilityListener>();
+					listener.Init(element.gameObject.activeSelf, lastHeader, uiGrid);
 				}
 			}
 
@@ -83,6 +87,37 @@ namespace ModSettings {
 				Debug.LogWarning("[ModSettings] More GUI elements in queue!");
 				while (sections.Count > 0) {
 					NextSection();
+				}
+			}
+		}
+
+		internal class HinterlandSettingVisibilityListener : MonoBehaviour {
+
+			private bool visible;
+			private Group header;
+			private UIGrid uiGrid;
+
+			internal void Init(bool visible, Group header, UIGrid uiGrid) {
+				this.visible = visible;
+				this.header = header;
+				this.uiGrid = uiGrid;
+
+				header.NotifyChildAdded(visible);
+			}
+
+			private void OnEnable() {
+				UpdateVisibility(gameObject.activeSelf);
+			}
+
+			private void OnDisable() {
+				UpdateVisibility(gameObject.activeSelf);
+			}
+
+			private void UpdateVisibility(bool newVisible) {
+				if (visible != newVisible) {
+					visible = newVisible;
+					header.NotifyChildVisible(newVisible);
+					uiGrid.repositionNow = true;
 				}
 			}
 		}
