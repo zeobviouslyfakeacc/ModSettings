@@ -30,7 +30,8 @@ namespace ModSettings {
 
 		private static void ResizeScrollBar(Panel_CustomXPSetup panel, UIGrid uiGrid) {
 			UISlider slider = panel.m_Scrollbar.GetComponentInChildren<UISlider>(true);
-			float absoluteVal = slider.value * panel.m_ScrollPanelHeight;
+			float viewHeight = panel.m_ScrollPanel.GetViewSize().y;
+			float absoluteVal = slider.value * (panel.m_ScrollPanelHeight - viewHeight);
 			int childCount = uiGrid.GetChildList().Count;
 
 			float height = childCount * gridCellHeight;
@@ -39,7 +40,7 @@ namespace ModSettings {
 			ScrollbarThumbResizer thumbResizer = slider.GetComponent<ScrollbarThumbResizer>();
 			thumbResizer.SetNumSteps((int) panel.m_ScrollPanel.height, (int) height);
 
-			slider.value = Mathf.Clamp01(absoluteVal / Mathf.Max(1, panel.m_ScrollPanelHeight));
+			slider.value = Mathf.Clamp01(absoluteVal / Mathf.Max(1, panel.m_ScrollPanelHeight - viewHeight));
 			panel.OnScrollbarChange();
 		}
 
