@@ -9,7 +9,8 @@ namespace ModSettings {
 		private bool afterLast;
 
 		internal CustomModeGUIBuilder(Panel_CustomXPSetup panel) : base(CreateUIGrid(panel), panel.m_CustomXPMenuItemOrder) {
-			panel.m_CustomXPMenuItemOrder.Clear();
+			// Remove all but the first element, which is the experience mode preset selector
+			panel.m_CustomXPMenuItemOrder.RemoveRange(1, panel.m_CustomXPMenuItemOrder.Count - 1);
 
 			Transform offset = panel.m_ScrollPanelOffsetTransform;
 			int sectionCount = offset.childCount - 1; // -1 for UI Grid we just created
@@ -30,7 +31,7 @@ namespace ModSettings {
 
 		private static void ResizeScrollBar(Panel_CustomXPSetup panel, UIGrid uiGrid) {
 			UISlider slider = panel.m_Scrollbar.GetComponentInChildren<UISlider>(true);
-			float viewHeight = panel.m_ScrollPanel.GetViewSize().y;
+			float viewHeight = panel.m_ScrollPanel.height;
 			float absoluteVal = slider.value * (panel.m_ScrollPanelHeight - viewHeight);
 			int childCount = uiGrid.GetChildList().Count;
 

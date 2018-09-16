@@ -8,7 +8,6 @@ namespace ModSettings {
 		internal readonly List<GameObject> menuItems;
 		internal readonly List<ModSettingsBase> modSettings;
 
-		internal int selectedIndex;
 		internal float scrollBarHeight;
 		internal bool requiresConfirmation;
 

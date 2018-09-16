@@ -8,7 +8,8 @@ namespace ModSettings {
 		private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
 
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
-		private ModTab currentTab;
+		private ModTab currentTab = null;
+		private int selectedIndex = 0;
 
 		private ConsoleComboBox modSelector;
 		private UIPanel scrollPanel;
@@ -121,6 +122,8 @@ namespace ModSettings {
 				currentTab.uiGrid.gameObject.SetActive(false);
 			}
 
+			selectedIndex = 0;
+
 			if (modTabs.TryGetValue(modName, out currentTab)) {
 				currentTab = modTabs[modName];
 				currentTab.uiGrid.gameObject.SetActive(true);
@@ -134,16 +137,15 @@ namespace ModSettings {
 
 		private void UpdateMenuNavigationGeneric() {
 			MethodInfo updateMethod = typeof(Panel_OptionsMenu).GetMethod("UpdateMenuNavigationGeneric", bindingFlags);
-			object[] args = { currentTab.selectedIndex, currentTab.menuItems };
+			object[] args = { selectedIndex, currentTab.menuItems };
 			updateMethod.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
-			currentTab.selectedIndex = (int) args[0];
+
+			selectedIndex = (int) args[0];
+			EnsureSelectedSettingVisible();
 		}
 
 		private void UpdateDescriptionLabel() {
-			if (currentTab.selectedIndex < 0 || currentTab.selectedIndex >= currentTab.menuItems.Count)
-				return;
-
-			GameObject setting = currentTab.menuItems[currentTab.selectedIndex];
+			GameObject setting = currentTab.menuItems[selectedIndex];
 			DescriptionHolder description = setting.GetComponent<DescriptionHolder>();
 
 			if (description == null)
@@ -157,22 +159,25 @@ namespace ModSettings {
 		}
 
 		private void EnsureSelectedSettingVisible() {
-			if (currentTab.selectedIndex < 0 || currentTab.selectedIndex >= currentTab.menuItems.Count)
-				return;
 			if (Utils.GetMenuMovementVertical(true, false) == 0f)
 				return;
 
-			GameObject setting = currentTab.menuItems[currentTab.selectedIndex];
+			if (selectedIndex == 0) {
+				scrollBarSlider.value = 0;
+				return;
+			}
 
+			GameObject setting = currentTab.menuItems[selectedIndex];
 			float settingY = -setting.transform.localPosition.y;
-			float scrollPanelTop = scrollPanelOffset.localPosition.y + 30f;
-			float scrollPanelBottom = scrollPanelOffset.localPosition.y + scrollPanel.height - 20f;
+			float scrollPanelTop = scrollPanelOffset.localPosition.y + GUIBuilder.gridCellHeight;
+			float scrollPanelBottom = scrollPanelOffset.localPosition.y + scrollPanel.height - GUIBuilder.gridCellHeight;
+
 			if (settingY < scrollPanelTop) {
-				scrollPanelOffset.localPosition += new Vector3(0, settingY - scrollPanelTop);
-				GameAudioManager.PlayGUIButtonClick();
+				scrollBarSlider.value += (settingY - scrollPanelTop) / currentTab.scrollBarHeight;
+				GameAudioManager.PlayGUIScroll();
 			} else if (settingY > scrollPanelBottom) {
-				scrollPanelOffset.localPosition += new Vector3(0, settingY - scrollPanelBottom);
-				GameAudioManager.PlayGUIButtonClick();
+				scrollBarSlider.value += (settingY - scrollPanelBottom) / currentTab.scrollBarHeight;
+				GameAudioManager.PlayGUIScroll();
 			}
 		}
 
@@ -215,7 +220,7 @@ namespace ModSettings {
 
 		internal ModTab CreateModTab(string modName) {
 			UIGrid grid = CreateUIGrid(modName);
-			List<GameObject> menuItems = new List<GameObject>();
+			List<GameObject> menuItems = new List<GameObject>() { modSelector.gameObject };
 			ModTab modTab = new ModTab(grid, menuItems);
 
 			grid.onReposition = () => ResizeScrollBar(modTab);
