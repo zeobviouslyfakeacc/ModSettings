@@ -84,6 +84,14 @@ namespace ModSettings {
 			}
 		}
 
+		[HarmonyPatch(typeof(UISlider), "OnStart", new Type[0])]
+		private static class FixSliderForegroundBarColor {
+			private static void Postfix(UISlider __instance) {
+				UIWidget foreground = (UIWidget) AccessTools.Field(typeof(UIProgressBar), "mFG").GetValue(__instance);
+				foreground.gameObject.AddMissingComponent<SliderBarDepthFixer>();
+			}
+		}
+
 		private static void MoveSlider(ConsoleSlider slider, float movement) {
 			if (movement < 0f) {
 				slider.OnDecrease();
@@ -105,6 +113,15 @@ namespace ModSettings {
 			float result = InputManager.GetMenuNavigationPrimary().x + InputManager.GetMenuNavigationSecondary().x;
 			MENU_DEADZONE_FIELD.SetValue(null, OLD_MENU_DEADZONE);
 			return result;
+		}
+
+		internal class SliderBarDepthFixer : MonoBehaviour {
+
+			private const int TARGET_DEPTH = 25;
+
+			private void OnEnable() {
+				gameObject.GetComponentInChildren<UIWidget>().depth = TARGET_DEPTH;
+			}
 		}
 	}
 }
