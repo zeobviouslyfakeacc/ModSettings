@@ -11,6 +11,7 @@ namespace ModSettings {
 		private const float MENU_DEADZONE = 0.05f;
 		private const float MOVEMENT_SPEED = 0.01f;
 
+		private static readonly MethodInfo MENU_MOVEMENT_METHOD = AccessTools.Method(typeof(Panel_OptionsMenu), "GetGenericSliderMovementHorizontal");
 		private static readonly FieldInfo MENU_DEADZONE_FIELD = AccessTools.Field(typeof(InputSystemRewired), "m_MenuNavigationDeadzone");
 		private static readonly float OLD_MENU_DEADZONE = (float) MENU_DEADZONE_FIELD.GetValue(null);
 
@@ -36,23 +37,36 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "UpdateMenuNavigationGeneric")]
 		private static class DisableTimerForSteplessSliderMove {
 
-			private static readonly MethodInfo MOVEMENT_METHOD = AccessTools.Method(typeof(Panel_OptionsMenu), "GetGenericSliderMovementHorizontal");
-
-			private static void Postfix(Panel_OptionsMenu __instance, ref int index, List<GameObject> menuItems) {
+			private static void Postfix(ref int index, List<GameObject> menuItems) {
 				ConsoleSlider slider = menuItems[index].GetComponentInChildren<ConsoleSlider>();
 				if (!slider || !slider.m_Slider || slider.m_Slider.numberOfSteps > 1)
 					return; // Not a stepless slider
 
-				float oldMovementWithTimer = (float) MOVEMENT_METHOD.Invoke(__instance, new object[0]);
+				float oldMovementWithTimer = GetTimeredMenuInputHorizontal();
 				if (oldMovementWithTimer != 0f)
 					return; // Already called OnIncrease or OnDecrease, we don't need to do that again
 
-				float newMovement = GetMenuInputHorizontal();
-				if (newMovement < 0f) {
-					slider.OnDecrease();
-				} else if (newMovement > 0f) {
-					slider.OnIncrease();
-				}
+				MoveSlider(slider, GetRawMenuInputHorizontal());
+			}
+		}
+
+		[HarmonyPatch(typeof(Panel_CustomXPSetup), "DoMainScreenControls")]
+		private static class MakeControllersMoveSlidersInCustomSettingsPanel {
+
+			private static readonly FieldInfo SELECTED_INDEX_FIELD = AccessTools.Field(typeof(Panel_CustomXPSetup), "m_CustomXPSelectedButtonIndex");
+
+			private static void Postfix(Panel_CustomXPSetup __instance) {
+				int selectedIndex = (int) SELECTED_INDEX_FIELD.GetValue(__instance);
+				List<GameObject> menuItems = __instance.m_CustomXPMenuItemOrder;
+
+				ConsoleSlider slider = menuItems[selectedIndex].GetComponentInChildren<ConsoleSlider>();
+				if (!slider || !slider.m_Slider)
+					return; // Not a slider
+
+				bool isStepless = (slider.m_Slider.numberOfSteps <= 1);
+				float movement = isStepless ? GetRawMenuInputHorizontal() : GetTimeredMenuInputHorizontal();
+
+				MoveSlider(slider, movement);
 			}
 		}
 
@@ -70,11 +84,23 @@ namespace ModSettings {
 			}
 		}
 
-		private static void UpdateSliderMoveAmount() {
-			sliderMoveAmount = MOVEMENT_SPEED * Mathf.Abs(GetMenuInputHorizontal());
+		private static void MoveSlider(ConsoleSlider slider, float movement) {
+			if (movement < 0f) {
+				slider.OnDecrease();
+			} else if (movement > 0f) {
+				slider.OnIncrease();
+			}
 		}
 
-		private static float GetMenuInputHorizontal() {
+		private static void UpdateSliderMoveAmount() {
+			sliderMoveAmount = MOVEMENT_SPEED * Mathf.Abs(GetRawMenuInputHorizontal());
+		}
+
+		private static float GetTimeredMenuInputHorizontal() {
+			return (float) MENU_MOVEMENT_METHOD.Invoke(InterfaceManager.m_Panel_OptionsMenu, new object[0]);
+		}
+
+		private static float GetRawMenuInputHorizontal() {
 			MENU_DEADZONE_FIELD.SetValue(null, MENU_DEADZONE);
 			float result = InputManager.GetMenuNavigationPrimary().x + InputManager.GetMenuNavigationSecondary().x;
 			MENU_DEADZONE_FIELD.SetValue(null, OLD_MENU_DEADZONE);
