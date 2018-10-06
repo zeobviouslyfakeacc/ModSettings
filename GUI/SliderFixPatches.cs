@@ -87,6 +87,9 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(UISlider), "OnStart", new Type[0])]
 		private static class FixSliderForegroundBarColor {
 			private static void Postfix(UISlider __instance) {
+				if (__instance is UIScrollBar || __instance.onDragFinished == null)
+					return;
+
 				UIWidget foreground = (UIWidget) AccessTools.Field(typeof(UIProgressBar), "mFG").GetValue(__instance);
 				foreground.gameObject.AddMissingComponent<SliderBarDepthFixer>();
 			}
