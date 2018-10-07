@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Reflection;
+using static ModSettings.AttributeFieldTypes;
 
 namespace ModSettings {
 	internal static class Attributes {
 
 		internal static void GetAttributes(FieldInfo field, out SectionAttribute section, out NameAttribute name,
-								   out DescriptionAttribute description, out SliderAttribute slider, out ChoiceAttribute choice) {
+		                                   out DescriptionAttribute description, out SliderAttribute slider, out ChoiceAttribute choice) {
 			// Must be assigned at least once, so assign to null first
 			section = null;
 			name = null;
@@ -30,22 +31,15 @@ namespace ModSettings {
 
 		internal static void ValidateFields(ModSettingsBase modSettings) {
 			foreach (FieldInfo field in modSettings.GetFields()) {
-				Type fieldType = field.FieldType;
-
-				if (fieldType.IsEnum) {
-					if (Enum.GetUnderlyingType(fieldType) != typeof(int))
-						throw new ArgumentException("[ModSettings] Only enums with an underlying type of int are currently supported", field.Name);
-				} else if (fieldType != typeof(int) && fieldType != typeof(bool) && fieldType != typeof(float)) {
-					throw new ArgumentException("[ModSettings] Only int, float, bool, and enum field types are currently supported", field.Name);
-				}
-
-				ValidateFieldAttributes(field, fieldType, modSettings);
+				ValidateFieldAttributes(modSettings, field);
 			}
 		}
 
-		private static void ValidateFieldAttributes(FieldInfo field, Type fieldType, ModSettingsBase modSettings) {
+		private static void ValidateFieldAttributes(ModSettingsBase modSettings, FieldInfo field) {
 			GetAttributes(field, out SectionAttribute section, out NameAttribute name,
 					out DescriptionAttribute description, out SliderAttribute slider, out ChoiceAttribute choice);
+
+			Type fieldType = field.FieldType;
 
 			if (name == null) {
 				throw new ArgumentException("[ModSettings] Mod settings contain field without a name attribute", field.Name);
@@ -56,57 +50,29 @@ namespace ModSettings {
 			if (section != null && string.IsNullOrEmpty(section.Title))
 				throw new ArgumentException("[ModSettings] Section title attribute must have a non-empty value", field.Name);
 
-			if (slider != null && choice != null)
+			if (slider != null && choice != null) {
 				throw new ArgumentException("[ModSettings] Field cannot be annotated with both 'Slider' and 'Choice' attributes", field.Name);
-
-			if (slider != null) {
-				if (fieldType != typeof(int) && fieldType != typeof(float))
-					throw new ArgumentException("[ModSettings] 'Slider' attribute can only be used on fields with int or float type", field.Name);
-
-				float max = Math.Max(slider.From, slider.To);
-				float min = Math.Min(slider.From, slider.To);
-				float defaultValue = Convert.ToSingle(field.GetValue(modSettings));
-				if (max == min) {
-					throw new ArgumentException("[ModSettings] 'Slider' must have different 'From' and 'To' values", field.Name);
-				} else if (defaultValue < min || defaultValue > max) {
-					throw new ArgumentException("[ModSettings] 'Slider' default value must be between 'From' and 'To'", field.Name);
-				}
-
-				if (slider.NumberFormat != null) {
-					try {
-						if (fieldType == typeof(int)) {
-							string.Format(slider.NumberFormat, 0);
-						} else if (fieldType == typeof(float)) {
-							string.Format(slider.NumberFormat, 0f);
-						}
-					} catch (FormatException fe) {
-						throw new ArgumentException("[ModSettings] Invalid 'Slider' number format", field.Name, fe);
-					}
-				}
+			} else if (slider != null) {
+				slider.ValidateFor(modSettings, field);
+			} else if (choice != null) {
+				choice.ValidateFor(modSettings, field);
+			} else if (!IsSupportedType(fieldType)) {
+				throw new ArgumentException("[ModSettings] Field type " + fieldType.Name + " is not supported", field.Name);
 			}
 
-			if (choice != null) {
-				if (fieldType != typeof(int) && !fieldType.IsEnum)
-					throw new ArgumentException("[ModSettings] 'Choice' attribute can only be used on fields with int or enum type", field.Name);
+			if (fieldType.IsEnum) {
+				ValidateEnum(field, fieldType);
+			}
+		}
 
-				if (choice.Names == null || choice.Names.Length == 0)
-					throw new ArgumentException("[ModSettings] 'Choice' attribute must contain non-empty array of non-empty strings", field.Name);
+		private static void ValidateEnum(FieldInfo field, Type enumType) {
+			int count = Enum.GetValues(enumType).Length;
+			Type underlyingType = Enum.GetUnderlyingType(enumType);
 
-				foreach (string choiceName in choice.Names) {
-					if (string.IsNullOrEmpty(choiceName))
-						throw new ArgumentException("[ModSettings] 'Choice' attribute must contain non-empty array of non-empty strings", field.Name);
-				}
-
-				int defaultValue = (int) field.GetValue(modSettings);
-				if (defaultValue < 0 || defaultValue >= choice.Names.Length) {
-					throw new ArgumentException("[ModSettings] Default value out of range for 'Choice' attribute", field.Name);
-				}
-			} else if (fieldType.IsEnum) {
-				Array values = Enum.GetValues(fieldType);
-				for (int i = 0; i < values.Length; ++i) {
-					if ((int) values.GetValue(i) != i)
-						throw new ArgumentException("[ModSettings] Enum fields without 'Choice' attribute must have consecutive values starting at 0", field.Name);
-				}
+			for (int i = 0; i < count; ++i) {
+				object enumValue = Convert.ChangeType(i, underlyingType);
+				if (!Enum.IsDefined(enumType, enumValue))
+					throw new ArgumentException("[ModSettings] Enum fields must have consecutive values starting at 0", field.Name);
 			}
 		}
 	}

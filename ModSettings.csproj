@@ -43,6 +43,7 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\SectionAttribute.cs" />
     <Compile Include="Attributes\SliderAttribute.cs" />
+    <Compile Include="Attributes\AttributeFieldTypes.cs" />
     <Compile Include="CustomModeMenu.cs" />
     <Compile Include="Example.cs" />
     <Compile Include="GUI\CustomModeGUIBuilder.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using static ModSettings.AttributeFieldTypes;
 
 namespace ModSettings {
 	internal abstract class GUIBuilder {
@@ -52,26 +53,25 @@ namespace ModSettings {
 					AddPaddingHeader();
 				}
 
-				Type fieldType = field.FieldType;
-				if (fieldType == typeof(bool)) {
-					AddYesNoSetting(modSettings, field, name, description);
-				} else if (fieldType == typeof(float)) {
-					if (slider != null) {
-						AddSliderSetting(modSettings, field, name, description, slider);
-					} else {
+				if (slider != null) {
+					AddSliderSetting(modSettings, field, name, description, slider);
+				} else if (choice != null) {
+					AddChoiceSetting(modSettings, field, name, description, choice);
+				} else {
+					// No Slider or Choice annotation, determine GUI object from field type
+					Type fieldType = field.FieldType;
+
+					if (fieldType.IsEnum) {
+						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.ForEnumType(fieldType));
+					} else if (fieldType == typeof(bool)) {
+						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.YesNoAttribute);
+					} else if (IsFloatType(fieldType)) {
 						AddSliderSetting(modSettings, field, name, description, SliderAttribute.DefaultFloatRange);
-					}
-				} else if (fieldType == typeof(int)) {
-					if (choice != null) {
-						AddChoiceSetting(modSettings, field, name, description, choice);
-					} else if (slider != null) {
-						AddSliderSetting(modSettings, field, name, description, slider);
-					} else {
+					} else if (IsIntegerType(fieldType)) {
 						AddSliderSetting(modSettings, field, name, description, SliderAttribute.DefaultIntRange);
+					} else {
+						throw new ArgumentException("Unsupported field type: " + fieldType.Name);
 					}
-				} else if (fieldType.IsEnum) {
-					ChoiceAttribute choiceAttr = choice ?? ChoiceAttribute.ForEnumType(fieldType);
-					AddChoiceSetting(modSettings, field, name, description, choiceAttr);
 				}
 			}
 		}
@@ -98,26 +98,6 @@ namespace ModSettings {
 			lastHeader = new Header(padding);
 		}
 
-		private void AddYesNoSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description) {
-			// Create menu item
-			GameObject setting = CreateSetting(name, description, comboBoxPrefab, "Label");
-			ConsoleComboBox comboBox = setting.GetComponent<ConsoleComboBox>();
-
-			// Add listener and set default value
-			EventDelegate.Set(comboBox.onChange, () => SetSettingsField(modSettings, field, (comboBox.GetCurrentIndex() == 1)));
-			modSettings.AddMenuVisibilityListener((visible) => UpdateYesNoComboBox(modSettings, field, comboBox, visible));
-
-			// Control visibility
-			SetVisibilityListener(modSettings, field, setting, lastHeader);
-		}
-
-		private static void UpdateYesNoComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox, bool visible) {
-			if (visible) {
-				bool value = (bool) field.GetValue(modSettings);
-				comboBox.value = comboBox.items[value ? 1 : 0];
-			}
-		}
-
 		private void AddChoiceSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, ChoiceAttribute choice) {
 			// Create menu item
 			GameObject setting = CreateSetting(name, description, comboBoxPrefab, "Label");
@@ -129,16 +109,25 @@ namespace ModSettings {
 			comboBox.m_Localize = choice.Localize;
 
 			// Add listener and set default value
-			EventDelegate.Set(comboBox.onChange, () => SetSettingsField(modSettings, field, comboBox.GetCurrentIndex()));
+			EventDelegate.Set(comboBox.onChange, () => UpdateChoiceValue(modSettings, field, comboBox.GetCurrentIndex()));
 			modSettings.AddMenuVisibilityListener((visible) => UpdateChoiceComboBox(modSettings, field, comboBox, visible));
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
 		}
 
+		private void UpdateChoiceValue(ModSettingsBase modSettings, FieldInfo field, int selectedIndex) {
+			Type fieldType = field.FieldType;
+			if (fieldType.IsEnum) {
+				fieldType = Enum.GetUnderlyingType(fieldType);
+			}
+
+			SetSettingsField(modSettings, field, Convert.ChangeType(selectedIndex, fieldType, null));
+		}
+
 		private static void UpdateChoiceComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox, bool visible) {
 			if (visible) {
-				int value = (int) field.GetValue(modSettings);
+				int value = Convert.ToInt32(field.GetValue(modSettings));
 				comboBox.value = comboBox.items[value];
 			}
 		}
@@ -151,19 +140,16 @@ namespace ModSettings {
 			UISlider uiSlider = slider.m_SliderObject.GetComponentInChildren<UISlider>();
 
 			// Sanitize user values, especially if the field type is int
-			float from, to;
-			int numberOfSteps;
-			string numberFormat;
-			if (field.FieldType == typeof(float)) {
-				from = range.From;
-				to = range.To;
-				numberOfSteps = (range.NumberOfSteps < 0) ? 1 : range.NumberOfSteps;
-				numberFormat = range.NumberFormat ?? SliderAttribute.DefaultFloatFormat;
-			} else {
-				from = Mathf.Round(range.From);
-				to = Mathf.Round(range.To);
-				numberOfSteps = (range.NumberOfSteps < 0) ? Mathf.RoundToInt(Mathf.Abs(from - to)) + 1 : range.NumberOfSteps;
-				numberFormat = range.NumberFormat ?? SliderAttribute.DefaultIntFormat;
+			bool isFloat = IsFloatType(field.FieldType);
+			float from = isFloat ? range.From : Mathf.Round(range.From);
+			float to = isFloat ? range.To : Mathf.Round(range.To);
+			int numberOfSteps = range.NumberOfSteps;
+			if (numberOfSteps < 0) {
+				numberOfSteps = isFloat ? 1 : Mathf.RoundToInt(Mathf.Abs(from - to)) + 1;
+			}
+			string numberFormat = range.NumberFormat;
+			if (string.IsNullOrEmpty(numberFormat)) {
+				numberFormat = isFloat ? SliderAttribute.DefaultFloatFormat : SliderAttribute.DefaultIntFormat;
 			}
 
 			// Add listeners to update setting value
@@ -187,11 +173,12 @@ namespace ModSettings {
 			if (sliderValue == oldValue)
 				return;
 
-			if (field.FieldType == typeof(float)) {
-				SetSettingsField(modSettings, field, sliderValue);
+			Type fieldType = field.FieldType;
+			if (IsFloatType(fieldType)) {
+				SetSettingsField(modSettings, field, Convert.ChangeType(sliderValue, fieldType, null));
 			} else {
-				int intValue = Mathf.RoundToInt(sliderValue);
-				SetSettingsField(modSettings, field, intValue);
+				long longValue = (long) Mathf.Round(sliderValue);
+				SetSettingsField(modSettings, field, Convert.ChangeType(longValue, fieldType, null));
 			}
 
 			UpdateSliderLabel(field, label, sliderValue, numberFormat);
@@ -210,11 +197,11 @@ namespace ModSettings {
 		}
 
 		private static void UpdateSliderLabel(FieldInfo field, UILabel label, float value, string numberFormat) {
-			if (field.FieldType == typeof(float)) {
+			if (IsFloatType(field.FieldType)) {
 				label.text = string.Format(numberFormat, value);
 			} else {
-				int intValue = Mathf.RoundToInt(value);
-				label.text = string.Format(numberFormat, intValue);
+				long longValue = (long) Mathf.Round(value);
+				label.text = string.Format(numberFormat, longValue);
 			}
 		}
 

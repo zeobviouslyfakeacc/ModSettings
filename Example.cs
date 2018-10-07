@@ -14,7 +14,7 @@ namespace ModSettingsExample {
 		public bool boolVal = true;
 
 		[Name("Choice from string array")]
-		[Description("Requires a Choice attribute and int or enum type. Default value = index in choice array")]
+		[Description("Requires a Choice attribute and an integer, boolean, or enum type. Default value = index in choice array")]
 		[Choice("Utopia", "Something in between", "Dystopian Nightmare")]
 		public int stringChoice = 1;
 
@@ -27,6 +27,7 @@ namespace ModSettingsExample {
 		public CustomTunableTimeOfDay timeOfDayChoice = CustomTunableTimeOfDay.Midnight;
 
 		[Name("Slider for a float, no steps")]
+		[Description("Also works with double or decimal, but they're limited to float range and accuracy")]
 		[Slider(-10f, 10f)]
 		public float steplessSliderValue = 2.5f;
 
@@ -35,6 +36,7 @@ namespace ModSettingsExample {
 		public float steppedSliderValue = -0.5f;
 
 		[Name("Slider for an int")]
+		[Description("Also works with byte, sbyte, short, ushort, uint, and long")]
 		[Slider(-5, 5)] // -5, -4, ..., 4, 5
 		public int intSliderValue = 1;
 

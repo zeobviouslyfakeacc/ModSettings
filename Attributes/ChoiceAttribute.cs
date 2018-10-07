@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using static CustomExperienceModeManager;
+using static ModSettings.AttributeFieldTypes;
 
 namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
@@ -19,6 +21,8 @@ namespace ModSettings {
 			{ typeof(CustomTunableWeather),            Localized("GAMEPLAY_WeatherClear", "GAMEPLAY_WeatherLightSnow", "GAMEPLAY_WeatherHeavySnow",
 			                                                     "GAMEPLAY_WeatherBlizzard", "GAMEPLAY_WeatherLightFog", "GAMEPLAY_WeatherHeavyFog", "GAMEPLAY_Random") }
 		};
+
+		internal static readonly ChoiceAttribute YesNoAttribute = Localized("GAMEPLAY_No", "GAMEPLAY_Yes");
 
 		internal static ChoiceAttribute ForEnumType(Type enumType) {
 			// Use predefined value names for Hinterland enums
@@ -64,6 +68,42 @@ namespace ModSettings {
 		public bool Localize {
 			get => localize;
 			set => localize = value;
+		}
+
+		internal void ValidateFor(ModSettingsBase modSettings, FieldInfo field) {
+			Type fieldType = field.FieldType;
+			Type enumType = null;
+
+			if (fieldType.IsEnum) {
+				enumType = fieldType;
+				fieldType = Enum.GetUnderlyingType(fieldType);
+			}
+
+			if (!IsChoiceType(fieldType))
+				throw new ArgumentException("[ModSettings] 'Choice' attribute doesn't support fields of type " + fieldType.Name, field.Name);
+
+			long typeMax = MaxValue(fieldType);
+
+			if (names == null || names.Length == 0) {
+				throw new ArgumentException("[ModSettings] 'Choice' attribute must contain non-empty array of non-empty strings", field.Name);
+			} else if (names.Length == 1) {
+				throw new ArgumentException("[ModSettings] 'Choice' attribute must contain array of at least two elements", field.Name);
+			} else if (names.Length - 1 > typeMax) {
+				throw new ArgumentException("[ModSettings] 'Choice' attribute contains more elements than " + fieldType.Name
+				                            + " can represent: " + names.Length + " > " + (typeMax + 1), field.Name);
+			} else if (enumType != null && names.Length != Enum.GetValues(enumType).Length)
+				throw new ArgumentException("[ModSettings] 'Choice' attribute array length doesn't match " + enumType.Name
+				                            + " enum value count: " + names.Length + " != " + Enum.GetValues(enumType).Length, field.Name);
+
+			foreach (string name in names) {
+				if (string.IsNullOrEmpty(name))
+					throw new ArgumentException("[ModSettings] 'Choice' attribute must contain non-empty array of non-empty strings", field.Name);
+			}
+
+			int defaultValue = Convert.ToInt32(field.GetValue(modSettings));
+			if (defaultValue < 0 || defaultValue >= names.Length) {
+				throw new ArgumentException("[ModSettings] Default value out of range for 'Choice' attribute", field.Name);
+			}
 		}
 	}
 }
