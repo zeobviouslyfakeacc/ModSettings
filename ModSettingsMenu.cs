@@ -5,24 +5,27 @@ using UnityEngine;
 namespace ModSettings {
 	internal static class ModSettingsMenu {
 
-		private static readonly HashSet<ModSettingsBase> settings = new HashSet<ModSettingsBase>();
+		private static readonly HashSet<ModSettingsBase> mainMenuSettings = new HashSet<ModSettingsBase>();
+		private static readonly HashSet<ModSettingsBase> inGameSettings = new HashSet<ModSettingsBase>();
 		private static readonly SortedDictionary<string, List<ModSettingsBase>> settingsByModName = new SortedDictionary<string, List<ModSettingsBase>>();
-		private static readonly Dictionary<ModSettingsBase, MenuType> menuTypes = new Dictionary<ModSettingsBase, MenuType>();
 
 		private static ModSettingsGUI modSettingsGUI = null;
 
 		internal static void RegisterSettings(ModSettingsBase modSettings, string modName, MenuType menuType) {
 			if (string.IsNullOrEmpty(modName)) {
 				throw new ArgumentException("[ModSettings] Mod name must be a non-empty string", "modName");
-			} else if (settings.Contains(modSettings)) {
+			} else if (mainMenuSettings.Contains(modSettings) || inGameSettings.Contains(modSettings)) {
 				throw new ArgumentException("[ModSettings] Cannot add the same settings object multiple times", "modSettings");
 			} else if (modSettingsGUI != null) {
 				throw new InvalidOperationException("[ModSettings] RegisterSettings called after the GUI has been built.\n"
 						+ "Call this method before Panel_CustomXPSetup::Awake, preferably from your mod's OnLoad method");
 			}
 
-			settings.Add(modSettings);
-			menuTypes.Add(modSettings, menuType);
+			if (menuType != MenuType.InGameOnly)
+				mainMenuSettings.Add(modSettings);
+			if (menuType != MenuType.MainMenuOnly)
+				inGameSettings.Add(modSettings);
+
 			if (settingsByModName.TryGetValue(modName, out List<ModSettingsBase> settingsList)) {
 				settingsList.Add(modSettings);
 			} else {
@@ -43,19 +46,15 @@ namespace ModSettings {
 			}
 		}
 
-		internal static void SetSettingsVisible(MenuType menuType) {
-			foreach (KeyValuePair<ModSettingsBase, MenuType> entry in menuTypes) {
-				entry.Key.SetMenuVisible(entry.Value == MenuType.Both || entry.Value == menuType);
+		internal static void SetSettingsVisible(bool isMainMenu, bool visible) {
+			HashSet<ModSettingsBase> settings = isMainMenu ? mainMenuSettings : inGameSettings;
+			foreach (ModSettingsBase modSettings in settings) {
+				modSettings.SetMenuVisible(visible);
 			}
 		}
 
-		internal static void SetAllSettingsInvisible() {
-			foreach (ModSettingsBase setting in menuTypes.Keys) {
-				setting.SetMenuVisible(false);
-			}
-		}
-
-		internal static bool HasVisibleModSettings() {
+		internal static bool HasVisibleModSettings(bool isMainMenu) {
+			HashSet<ModSettingsBase> settings = isMainMenu ? mainMenuSettings : inGameSettings;
 			foreach (ModSettingsBase modSettings in settings) {
 				if (modSettings.IsUserVisible())
 					return true;

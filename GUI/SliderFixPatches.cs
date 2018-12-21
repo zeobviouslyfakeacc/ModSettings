@@ -112,8 +112,9 @@ namespace ModSettings {
 		}
 
 		private static float GetRawMenuInputHorizontal() {
+			Panel_OptionsMenu options = InterfaceManager.m_Panel_OptionsMenu;
 			MENU_DEADZONE_FIELD.SetValue(null, MENU_DEADZONE);
-			float result = InputManager.GetMenuNavigationPrimary().x + InputManager.GetMenuNavigationSecondary().x;
+			float result = InputManager.GetMenuNavigationPrimary(options).x + InputManager.GetMenuNavigationSecondary(options).x;
 			MENU_DEADZONE_FIELD.SetValue(null, OLD_MENU_DEADZONE);
 			return result;
 		}

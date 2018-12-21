@@ -5,7 +5,10 @@ using UnityEngine;
 namespace ModSettings {
 	internal class ModSettingsGUI : MonoBehaviour {
 
-		private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
+		private static readonly MethodInfo setTabActive = typeof(Panel_OptionsMenu)
+			.GetMethod("SetTabActive", BindingFlags.NonPublic | BindingFlags.Instance);
+		private static readonly MethodInfo updateMenuNavigationGeneric = typeof(Panel_OptionsMenu)
+			.GetMethod("UpdateMenuNavigationGeneric", BindingFlags.NonPublic | BindingFlags.Instance);
 
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
 		private ModTab currentTab = null;
@@ -136,9 +139,8 @@ namespace ModSettings {
 		}
 
 		private void UpdateMenuNavigationGeneric() {
-			MethodInfo updateMethod = typeof(Panel_OptionsMenu).GetMethod("UpdateMenuNavigationGeneric", bindingFlags);
 			object[] args = { selectedIndex, currentTab.menuItems };
-			updateMethod.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
+			updateMenuNavigationGeneric.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
 
 			selectedIndex = (int) args[0];
 			EnsureSelectedSettingVisible();
@@ -159,7 +161,7 @@ namespace ModSettings {
 		}
 
 		private void EnsureSelectedSettingVisible() {
-			if (Utils.GetMenuMovementVertical(true, false) == 0f)
+			if (Utils.GetMenuMovementVertical(InterfaceManager.m_Panel_OptionsMenu, true, false) == 0f)
 				return;
 
 			if (selectedIndex == 0) {
@@ -182,17 +184,16 @@ namespace ModSettings {
 		}
 
 		internal void Enable(Panel_OptionsMenu parentMenu) {
-			bool inMainMenu = InterfaceManager.IsMainMenuActive();
-			MenuType menuType = inMainMenu ? MenuType.MainMenuOnly : MenuType.InGameOnly;
-			ModSettingsMenu.SetSettingsVisible(menuType);
-
 			GameAudioManager.PlayGUIButtonClick();
-			MethodInfo method = typeof(Panel_OptionsMenu).GetMethod("SetTabActive", bindingFlags);
-			method.Invoke(parentMenu, new object[] { gameObject });
+			setTabActive.Invoke(parentMenu, new object[] { gameObject });
+		}
+
+		private void OnEnable() {
+			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: true);
 		}
 
 		private void OnDisable() {
-			ModSettingsMenu.SetAllSettingsInvisible();
+			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: false);
 
 			foreach (ModTab tab in modTabs.Values) {
 				tab.requiresConfirmation = false;

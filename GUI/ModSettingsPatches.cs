@@ -10,7 +10,7 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "ConfigureMenu", new Type[0])]
 		private static class AddModSettingsButton {
 			private static void Postfix(Panel_OptionsMenu __instance) {
-				if (!ModSettingsMenu.HasVisibleModSettings())
+				if (!ModSettingsMenu.HasVisibleModSettings(isMainMenu: InterfaceManager.IsMainMenuActive()))
 					return;
 
 				BasicMenu basicMenu = (BasicMenu) AccessTools.Field(typeof(Panel_OptionsMenu), "m_BasicMenu").GetValue(__instance);
@@ -34,7 +34,7 @@ namespace ModSettings {
 				if (!settingsTab.activeInHierarchy)
 					return;
 
-				if (InputManager.GetEscapePressed()) {
+				if (InputManager.GetEscapePressed(__instance)) {
 					__instance.OnCancel();
 				}
 			}
