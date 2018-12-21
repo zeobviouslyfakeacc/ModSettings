@@ -94,9 +94,6 @@ namespace ModSettings {
 			}
 		}
 
-		[Obsolete("All settings now require confirmation by default. This method will be removed in the next version", true)]
-		protected void RequiresConfirmation() { }
-
 		protected virtual void OnConfirm() { }
 
 		protected virtual void OnChange(FieldInfo field, object oldValue, object newValue) { }
