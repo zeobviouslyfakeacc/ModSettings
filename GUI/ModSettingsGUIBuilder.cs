@@ -51,7 +51,7 @@ namespace ModSettings {
 
 		protected override void SetSettingsField(ModSettingsBase modSettings, FieldInfo field, object newValue) {
 			base.SetSettingsField(modSettings, field, newValue);
-			settingsGUI.SetSettingsNeedConfirmation(true);
+			settingsGUI.NotifySettingsNeedConfirmation();
 		}
 
 		private class MenuGroup : Group {

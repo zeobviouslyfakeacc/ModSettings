@@ -5,10 +5,12 @@ using UnityEngine;
 namespace ModSettings {
 	internal class ModSettingsGUI : MonoBehaviour {
 
-		private static readonly MethodInfo setTabActive = typeof(Panel_OptionsMenu)
+		private static readonly MethodInfo SET_TAB_ACTIVE = typeof(Panel_OptionsMenu)
 			.GetMethod("SetTabActive", BindingFlags.NonPublic | BindingFlags.Instance);
-		private static readonly MethodInfo updateMenuNavigationGeneric = typeof(Panel_OptionsMenu)
+		private static readonly MethodInfo UPDATE_MENU_NAVIGATION_GENERIC = typeof(Panel_OptionsMenu)
 			.GetMethod("UpdateMenuNavigationGeneric", BindingFlags.NonPublic | BindingFlags.Instance);
+		private static readonly FieldInfo SETTINGS_NEED_CONFIRMATION = typeof(Panel_OptionsMenu)
+			.GetField("m_SettingsNeedConfirmation", BindingFlags.NonPublic | BindingFlags.Instance);
 
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
 		private ModTab currentTab = null;
@@ -131,8 +133,6 @@ namespace ModSettings {
 				currentTab = modTabs[modName];
 				currentTab.uiGrid.gameObject.SetActive(true);
 
-				SetConfirmButtonVisible(currentTab.requiresConfirmation);
-
 				ResizeScrollBar(currentTab);
 				EnsureSelectedSettingVisible();
 			}
@@ -140,7 +140,7 @@ namespace ModSettings {
 
 		private void UpdateMenuNavigationGeneric() {
 			object[] args = { selectedIndex, currentTab.menuItems };
-			updateMenuNavigationGeneric.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
+			UPDATE_MENU_NAVIGATION_GENERIC.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
 
 			selectedIndex = (int) args[0];
 			EnsureSelectedSettingVisible();
@@ -185,7 +185,7 @@ namespace ModSettings {
 
 		internal void Enable(Panel_OptionsMenu parentMenu) {
 			GameAudioManager.PlayGUIButtonClick();
-			setTabActive.Invoke(parentMenu, new object[] { gameObject });
+			SET_TAB_ACTIVE.Invoke(parentMenu, new object[] { gameObject });
 		}
 
 		private void OnEnable() {
@@ -198,25 +198,30 @@ namespace ModSettings {
 			foreach (ModTab tab in modTabs.Values) {
 				tab.requiresConfirmation = false;
 			}
+			SetConfirmButtonVisible(false);
 		}
 
-		internal void SetSettingsNeedConfirmation(bool value) {
-			currentTab.requiresConfirmation = value;
-			SetConfirmButtonVisible(value);
+		internal void NotifySettingsNeedConfirmation() {
+			currentTab.requiresConfirmation = true;
+			SetConfirmButtonVisible(true);
 		}
 
 		private void SetConfirmButtonVisible(bool value) {
-			FieldInfo needConfirmation = typeof(Panel_OptionsMenu).GetField("m_SettingsNeedConfirmation", BindingFlags.NonPublic | BindingFlags.Instance);
-			needConfirmation.SetValue(InterfaceManager.m_Panel_OptionsMenu, value);
+			SETTINGS_NEED_CONFIRMATION.SetValue(InterfaceManager.m_Panel_OptionsMenu, value);
 		}
 
 		internal void CallOnConfirm() {
-			if (currentTab == null)
-				return;
+			foreach (ModTab tab in modTabs.Values) {
+				if (!tab.requiresConfirmation)
+					continue;
 
-			foreach (ModSettingsBase modSettings in currentTab.modSettings) {
-				modSettings.CallOnConfirm();
+				tab.requiresConfirmation = false;
+				foreach (ModSettingsBase modSettings in tab.modSettings) {
+					modSettings.CallOnConfirm();
+				}
 			}
+
+			SetConfirmButtonVisible(false);
 		}
 
 		internal ModTab CreateModTab(string modName) {

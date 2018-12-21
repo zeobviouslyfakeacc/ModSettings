@@ -56,7 +56,6 @@ namespace ModSettings {
 					return true;
 
 				GameAudioManager.PlayGuiConfirm();
-				gui.SetSettingsNeedConfirmation(false);
 				gui.CallOnConfirm();
 
 				return false;
