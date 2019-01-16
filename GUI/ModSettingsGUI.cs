@@ -130,7 +130,6 @@ namespace ModSettings {
 			selectedIndex = 0;
 
 			if (modTabs.TryGetValue(modName, out currentTab)) {
-				currentTab = modTabs[modName];
 				currentTab.uiGrid.gameObject.SetActive(true);
 
 				ResizeScrollBar(currentTab);
@@ -190,6 +189,14 @@ namespace ModSettings {
 
 		private void OnEnable() {
 			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: true);
+
+			if (modSelector.items.Count > 0) {
+				modSelector.items.Sort();
+
+				string firstMod = modSelector.items[0];
+				modSelector.value = firstMod;
+				SelectMod(firstMod);
+			}
 		}
 
 		private void OnDisable() {
@@ -232,19 +239,11 @@ namespace ModSettings {
 			grid.onReposition = () => ResizeScrollBar(modTab);
 
 			modTabs.Add(modName, modTab);
-			AddModSelector(modName);
-
 			return modTab;
 		}
 
 		internal void AddModSelector(string modName) {
-			bool firstMod = modSelector.items.Count == 0;
 			modSelector.items.Add(modName);
-
-			if (firstMod) {
-				modSelector.value = modName;
-				SelectMod(modName);
-			}
 		}
 
 		internal void RemoveModSelector(string modName) {
