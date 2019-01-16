@@ -45,7 +45,8 @@
     <Compile Include="Attributes\SliderAttribute.cs" />
     <Compile Include="Attributes\AttributeFieldTypes.cs" />
     <Compile Include="CustomModeMenu.cs" />
-    <Compile Include="Example.cs" />
+    <Compile Include="Examples\BasicExample.cs" />
+    <Compile Include="Examples\VisibilityExample.cs" />
     <Compile Include="GUI\CustomModeGUIBuilder.cs" />
     <Compile Include="GUI\CustomModePatches.cs" />
     <Compile Include="GUI\DescriptionHolder.cs" />
