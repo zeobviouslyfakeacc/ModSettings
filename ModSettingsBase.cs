@@ -7,6 +7,7 @@ namespace ModSettings {
 
 		private readonly FieldInfo[] fields;
 		private readonly Dictionary<FieldInfo, object> confirmedValues;
+		private readonly List<Action> refreshActions;
 
 		private readonly Visibility menuVisibility;
 		private readonly Visibility visibility;
@@ -15,6 +16,7 @@ namespace ModSettings {
 		protected ModSettingsBase() {
 			fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
 			confirmedValues = new Dictionary<FieldInfo, object>(fields.Length);
+			refreshActions = new List<Action>();
 
 			menuVisibility = new Visibility();
 			menuVisibility.SetVisible(false);
@@ -24,9 +26,10 @@ namespace ModSettings {
 					foreach (FieldInfo field in fields) {
 						confirmedValues[field] = field.GetValue(this);
 					}
+					RefreshGUI();
 				} else {
 					foreach (FieldInfo field in fields) {
-						SetFieldValue(field, confirmedValues[field]);
+						field.SetValue(this, confirmedValues[field]);
 					}
 				}
 			});
@@ -50,6 +53,15 @@ namespace ModSettings {
 
 		public void AddToModSettings(string modName, MenuType menuType) {
 			ModSettingsMenu.RegisterSettings(this, modName, menuType);
+		}
+
+		public void RefreshGUI() {
+			if (!menuVisibility.IsVisible())
+				return;
+
+			foreach (Action refreshAction in refreshActions) {
+				refreshAction();
+			}
 		}
 
 		internal void SetMenuVisible(bool visible) {
@@ -122,8 +134,8 @@ namespace ModSettings {
 
 		internal delegate void OnVisibilityChange(bool visible);
 
-		internal void AddMenuVisibilityListener(OnVisibilityChange listener) {
-			menuVisibility.AddVisibilityListener(listener);
+		internal void AddRefreshAction(Action onRefresh) {
+			refreshActions.Add(onRefresh);
 		}
 
 		internal void AddVisibilityListener(OnVisibilityChange listener) {

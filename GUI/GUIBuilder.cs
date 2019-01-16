@@ -110,7 +110,7 @@ namespace ModSettings {
 
 			// Add listener and set default value
 			EventDelegate.Set(comboBox.onChange, () => UpdateChoiceValue(modSettings, field, comboBox.GetCurrentIndex()));
-			modSettings.AddMenuVisibilityListener((visible) => UpdateChoiceComboBox(modSettings, field, comboBox, visible));
+			modSettings.AddRefreshAction(() => UpdateChoiceComboBox(modSettings, field, comboBox));
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
@@ -125,11 +125,9 @@ namespace ModSettings {
 			SetSettingsField(modSettings, field, Convert.ChangeType(selectedIndex, fieldType, null));
 		}
 
-		private static void UpdateChoiceComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox, bool visible) {
-			if (visible) {
-				int value = Convert.ToInt32(field.GetValue(modSettings));
-				comboBox.value = comboBox.items[value];
-			}
+		private static void UpdateChoiceComboBox(ModSettingsBase modSettings, FieldInfo field, ConsoleComboBox comboBox) {
+			int value = Convert.ToInt32(field.GetValue(modSettings));
+			comboBox.value = comboBox.items[value];
 		}
 
 		private void AddSliderSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, SliderAttribute range) {
@@ -156,7 +154,7 @@ namespace ModSettings {
 			EventDelegate.Callback callback = () => UpdateSliderValue(modSettings, field, uiSlider, uiLabel, from, to, numberFormat);
 			EventDelegate.Set(slider.onChange, callback);
 			EventDelegate.Set(uiSlider.onChange, callback);
-			modSettings.AddMenuVisibilityListener((visible) => UpdateSlider(modSettings, field, uiSlider, uiLabel, from, to, numberFormat, visible));
+			modSettings.AddRefreshAction(() => UpdateSlider(modSettings, field, uiSlider, uiLabel, from, to, numberFormat));
 
 			// Set default value and number of steps
 			float defaultValue = Convert.ToSingle(field.GetValue(modSettings));
@@ -188,12 +186,10 @@ namespace ModSettings {
 			}
 		}
 
-		private static void UpdateSlider(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat, bool visible) {
-			if (visible) {
-				float value = Convert.ToSingle(field.GetValue(modSettings));
-				slider.value = (value - from) / (to - from);
-				UpdateSliderLabel(field, label, value, numberFormat);
-			}
+		private static void UpdateSlider(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
+			float value = Convert.ToSingle(field.GetValue(modSettings));
+			slider.value = (value - from) / (to - from);
+			UpdateSliderLabel(field, label, value, numberFormat);
 		}
 
 		private static void UpdateSliderLabel(FieldInfo field, UILabel label, float value, string numberFormat) {
