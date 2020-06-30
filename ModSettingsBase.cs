@@ -111,14 +111,14 @@ namespace ModSettings {
 		protected virtual void OnChange(FieldInfo field, object oldValue, object newValue) { }
 
 		internal void CallOnConfirm() {
-			foreach (FieldInfo field in fields) {
-				confirmedValues[field] = field.GetValue(this);
-			}
-
 			try {
 				OnConfirm();
 			} catch (Exception e) {
 				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler\n" + e.ToString());
+			}
+
+			foreach (FieldInfo field in fields) {
+				confirmedValues[field] = field.GetValue(this);
 			}
 		}
 
