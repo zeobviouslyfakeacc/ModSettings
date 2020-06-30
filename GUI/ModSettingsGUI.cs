@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
+using Il2Cpp = Il2CppSystem.Collections.Generic;
 
 namespace ModSettings {
 	internal class ModSettingsGUI : MonoBehaviour {
 
-		private static readonly MethodInfo SET_TAB_ACTIVE = typeof(Panel_OptionsMenu)
-			.GetMethod("SetTabActive", BindingFlags.NonPublic | BindingFlags.Instance);
-		private static readonly MethodInfo UPDATE_MENU_NAVIGATION_GENERIC = typeof(Panel_OptionsMenu)
-			.GetMethod("UpdateMenuNavigationGeneric", BindingFlags.NonPublic | BindingFlags.Instance);
-		private static readonly FieldInfo SETTINGS_NEED_CONFIRMATION = typeof(Panel_OptionsMenu)
-			.GetField("m_SettingsNeedConfirmation", BindingFlags.NonPublic | BindingFlags.Instance);
+		static ModSettingsGUI() {
+			UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<ModSettingsGUI>();
+		}
+
+		public ModSettingsGUI(System.IntPtr ptr) : base(ptr) { }
 
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
 		private ModTab currentTab = null;
@@ -22,7 +22,8 @@ namespace ModSettings {
 		private GameObject scrollBar;
 		private UISlider scrollBarSlider;
 
-		internal ModSettingsGUI() {
+		[HideFromIl2Cpp]
+		internal void Build() {
 			Transform contentArea = transform.Find("GameObject");
 
 			DestroyOldSettings(contentArea);
@@ -33,6 +34,7 @@ namespace ModSettings {
 			scrollBarSlider = scrollBar.GetComponentInChildren<UISlider>(true);
 		}
 
+		[HideFromIl2Cpp]
 		private static void DestroyOldSettings(Transform contentArea) {
 			int settingsCount = contentArea.childCount;
 			for (int i = settingsCount - 1; i >= 2; --i) {
@@ -42,8 +44,10 @@ namespace ModSettings {
 			}
 		}
 
+		[HideFromIl2Cpp]
 		private ConsoleComboBox CreateModSelector(Transform contentArea) {
 			ConsoleComboBox modSelector = contentArea.Find("Quality").GetComponent<ConsoleComboBox>();
+			modSelector.items.Clear();
 
 			// Make the combobox a lot larger
 			int xOffset = 200;
@@ -57,10 +61,11 @@ namespace ModSettings {
 			background.localPosition += offset / 2f;
 			background.GetComponent<UISprite>().width += xOffset;
 
-			EventDelegate.Set(modSelector.onChange, () => SelectMod(modSelector.value));
+			EventDelegate.Set(modSelector.onChange, new System.Action(() => SelectMod(modSelector.value)));
 			return modSelector;
 		}
 
+		[HideFromIl2Cpp]
 		private static UIPanel CreateScrollPanel(Transform contentArea) {
 			UIPanel panel = NGUITools.AddChild<UIPanel>(contentArea.gameObject);
 			panel.gameObject.name = "ScrollPanel";
@@ -71,12 +76,14 @@ namespace ModSettings {
 			return panel;
 		}
 
+		[HideFromIl2Cpp]
 		private static Transform CreateOffsetTransform(UIPanel scrollPanel) {
 			GameObject offset = NGUITools.AddChild(scrollPanel.gameObject);
 			offset.name = "Offset";
 			return offset.transform;
 		}
 
+		[HideFromIl2Cpp]
 		private GameObject CreateScrollBar(UIPanel scrollPanel) {
 			// Terrible code in this method. I've given up trying to fix their scroll bar layout
 			Panel_CustomXPSetup xpModePanel = InterfaceManager.m_Panel_CustomXPSetup;
@@ -92,7 +99,7 @@ namespace ModSettings {
 			slider.foregroundWidget.GetComponent<UISprite>().height = height;
 			scrollbar.transform.Find("glow").GetComponent<UISprite>().height = height + 44;
 
-			EventDelegate.Set(slider.onChange, () => OnScroll(slider, true));
+			EventDelegate.Set(slider.onChange, new System.Action(() => OnScroll(slider, true)));
 
 			return scrollbar;
 		}
@@ -100,8 +107,13 @@ namespace ModSettings {
 		private void Update() {
 			if (currentTab == null)
 				return;
+			if (InputManager.GetEscapePressed(InterfaceManager.m_Panel_OptionsMenu)) {
+				InterfaceManager.m_Panel_OptionsMenu.OnCancel();
+				return;
+			}
 
-			UpdateMenuNavigationGeneric();
+			InterfaceManager.m_Panel_OptionsMenu.UpdateMenuNavigationGeneric(ref selectedIndex, currentTab.menuItems);
+			EnsureSelectedSettingVisible();
 			UpdateDescriptionLabel();
 
 			if (currentTab.scrollBarHeight > 0) {
@@ -115,6 +127,7 @@ namespace ModSettings {
 			}
 		}
 
+		[HideFromIl2Cpp]
 		private void OnScroll(UISlider slider, bool playSound) {
 			scrollPanelOffset.localPosition = new Vector2(0, slider.value * (currentTab?.scrollBarHeight ?? 0));
 			if (playSound) {
@@ -122,29 +135,21 @@ namespace ModSettings {
 			}
 		}
 
+		[HideFromIl2Cpp]
 		private void SelectMod(string modName) {
 			if (currentTab != null) {
-				currentTab.uiGrid.gameObject.SetActive(false);
+				currentTab.uiGrid.gameObject.active = false;
 			}
 
 			selectedIndex = 0;
+			currentTab = modTabs[modName];
+			currentTab.uiGrid.gameObject.active = true;
 
-			if (modTabs.TryGetValue(modName, out currentTab)) {
-				currentTab.uiGrid.gameObject.SetActive(true);
-
-				ResizeScrollBar(currentTab);
-				EnsureSelectedSettingVisible();
-			}
-		}
-
-		private void UpdateMenuNavigationGeneric() {
-			object[] args = { selectedIndex, currentTab.menuItems };
-			UPDATE_MENU_NAVIGATION_GENERIC.Invoke(InterfaceManager.m_Panel_OptionsMenu, args);
-
-			selectedIndex = (int) args[0];
+			ResizeScrollBar(currentTab);
 			EnsureSelectedSettingVisible();
 		}
 
+		[HideFromIl2Cpp]
 		private void UpdateDescriptionLabel() {
 			GameObject setting = currentTab.menuItems[selectedIndex];
 			DescriptionHolder description = setting.GetComponent<DescriptionHolder>();
@@ -159,6 +164,7 @@ namespace ModSettings {
 			descriptionLabel.gameObject.SetActive(true);
 		}
 
+		[HideFromIl2Cpp]
 		private void EnsureSelectedSettingVisible() {
 			if (Utils.GetMenuMovementVertical(InterfaceManager.m_Panel_OptionsMenu, true, false) == 0f)
 				return;
@@ -182,9 +188,10 @@ namespace ModSettings {
 			}
 		}
 
+		[HideFromIl2Cpp]
 		internal void Enable(Panel_OptionsMenu parentMenu) {
 			GameAudioManager.PlayGUIButtonClick();
-			SET_TAB_ACTIVE.Invoke(parentMenu, new object[] { gameObject });
+			parentMenu.SetTabActive(gameObject);
 		}
 
 		private void OnEnable() {
@@ -208,15 +215,18 @@ namespace ModSettings {
 			SetConfirmButtonVisible(false);
 		}
 
+		[HideFromIl2Cpp]
 		internal void NotifySettingsNeedConfirmation() {
 			currentTab.requiresConfirmation = true;
 			SetConfirmButtonVisible(true);
 		}
 
+		[HideFromIl2Cpp]
 		private void SetConfirmButtonVisible(bool value) {
-			SETTINGS_NEED_CONFIRMATION.SetValue(InterfaceManager.m_Panel_OptionsMenu, value);
+			InterfaceManager.m_Panel_OptionsMenu.m_SettingsNeedConfirmation = value;
 		}
 
+		[HideFromIl2Cpp]
 		internal void CallOnConfirm() {
 			foreach (ModTab tab in modTabs.Values) {
 				if (!tab.requiresConfirmation)
@@ -231,25 +241,30 @@ namespace ModSettings {
 			SetConfirmButtonVisible(false);
 		}
 
+		[HideFromIl2Cpp]
 		internal ModTab CreateModTab(string modName) {
 			UIGrid grid = CreateUIGrid(modName);
-			List<GameObject> menuItems = new List<GameObject>() { modSelector.gameObject };
+			Il2Cpp.List<GameObject> menuItems = new Il2Cpp.List<GameObject>();
+			menuItems.Add(modSelector.gameObject);
 			ModTab modTab = new ModTab(grid, menuItems);
 
-			grid.onReposition = () => ResizeScrollBar(modTab);
+			grid.onReposition = new System.Action(() => ResizeScrollBar(modTab));
 
 			modTabs.Add(modName, modTab);
 			return modTab;
 		}
 
+		[HideFromIl2Cpp]
 		internal void AddModSelector(string modName) {
 			modSelector.items.Add(modName);
 		}
 
+		[HideFromIl2Cpp]
 		internal void RemoveModSelector(string modName) {
 			modSelector.items.Remove(modName);
 		}
 
+		[HideFromIl2Cpp]
 		private UIGrid CreateUIGrid(string modName) {
 			UIGrid uiGrid = NGUITools.AddChild<UIGrid>(scrollPanelOffset.gameObject);
 			uiGrid.gameObject.name = "Mod settings grid (" + modName + ")";
@@ -260,6 +275,7 @@ namespace ModSettings {
 			return uiGrid;
 		}
 
+		[HideFromIl2Cpp]
 		private void ResizeScrollBar(ModTab modTab) {
 			int childCount = modTab.uiGrid.GetChildList().Count;
 

@@ -37,6 +37,7 @@ namespace ModSettings {
 		internal static void BuildGUI() {
 			GameObject modSettingsTab = ModSettingsGUIBuilder.CreateModSettingsTab();
 			modSettingsGUI = modSettingsTab.AddComponent<ModSettingsGUI>();
+			modSettingsGUI.Build();
 
 			foreach (KeyValuePair<string, List<ModSettingsBase>> entry in settingsByModName) {
 				ModSettingsGUIBuilder guiBuilder = new ModSettingsGUIBuilder(entry.Key, modSettingsGUI);

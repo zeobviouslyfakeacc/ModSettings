@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using MelonLoader;
 
 [assembly: AssemblyTitle("ModSettings")]
 [assembly: AssemblyDescription("")]
@@ -13,3 +14,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("17c6ec09-2c53-4636-883c-9213e4300426")]
 [assembly: AssemblyVersion("1.5.0.0")]
 [assembly: AssemblyFileVersion("1.5.0.0")]
+[assembly: MelonModInfo(typeof(ModSettings.ModSettingsMod), "ModSettings", "1.5", "zeobviouslyfakeacc")]
+[assembly: MelonModGame("Hinterland", "TheLongDark")]

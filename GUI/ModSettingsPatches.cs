@@ -3,9 +3,35 @@ using Harmony;
 using UnityEngine;
 
 namespace ModSettings {
+
 	internal static class ModSettingsPatches {
 
 		private const int MOD_SETTINGS_ID = 0x4d53; // "MS" in hex
+
+		[HarmonyPatch(typeof(Panel_OptionsMenu), "InitializeAutosaveMenuItems", new Type[0])]
+		private static class BuildModSettingsGUIPatch {
+			private static void Postfix() {
+				DateTime tStart = DateTime.UtcNow;
+
+				try {
+					Debug.Log("[ModSettings] Building Mod Settings GUI");
+					ModSettingsMenu.BuildGUI();
+				} catch (Exception e) {
+					Debug.LogError("[ModSettings] Exception while building Mod Settings GUI\n" + e.ToString());
+					return;
+				}
+				try {
+					Debug.Log("[ModSettings] Building Custom Mode GUI");
+					CustomModeMenu.BuildGUI();
+				} catch (Exception e) {
+					Debug.LogError("[ModSettings] Exception while building Custom Mode GUI\n" + e.ToString());
+					return;
+				}
+
+				long timeMillis = (long) (DateTime.UtcNow - tStart).TotalMilliseconds;
+				Debug.Log("[ModSettings] Done! Took " + timeMillis + " ms. Have a nice day!");
+			}
+		}
 
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "ConfigureMenu", new Type[0])]
 		private static class AddModSettingsButton {
@@ -13,30 +39,33 @@ namespace ModSettings {
 				if (!ModSettingsMenu.HasVisibleModSettings(isMainMenu: InterfaceManager.IsMainMenuActive()))
 					return;
 
-				BasicMenu basicMenu = (BasicMenu) AccessTools.Field(typeof(Panel_OptionsMenu), "m_BasicMenu").GetValue(__instance);
+				BasicMenu basicMenu = __instance.m_BasicMenu;
 				if (basicMenu == null)
 					return;
 
+				AddAnotherMenuItem(basicMenu); // We need one more than they have...
+				BasicMenu.BasicMenuItemModel firstItem = basicMenu.m_ItemModelList[0];
 				int itemIndex = basicMenu.GetItemCount();
-				basicMenu.AddItem("ModSettings", MOD_SETTINGS_ID, itemIndex, "Mod Settings", "Change the configuration of your mods", null, () => ShowModSettings(__instance));
+				basicMenu.AddItem("ModSettings", MOD_SETTINGS_ID, itemIndex, "Mod Settings", "Change the configuration of your mods", null,
+						new Action(() => ShowModSettings(__instance)), firstItem.m_NormalTint, firstItem.m_HighlightTint);
 			}
 
 			private static void ShowModSettings(Panel_OptionsMenu __instance) {
 				ModSettingsGUI settings = GetModSettingsGUI(__instance);
 				settings.Enable(__instance);
 			}
-		}
 
-		[HarmonyPatch(typeof(Panel_OptionsMenu), "Update", new Type[0])]
-		private static class DoModSettingsTabUpdate {
-			private static void Postfix(Panel_OptionsMenu __instance) {
-				GameObject settingsTab = GetSettingsTab(__instance);
-				if (!settingsTab.activeInHierarchy)
-					return;
-
-				if (InputManager.GetEscapePressed(__instance)) {
-					__instance.OnCancel();
-				}
+			private static void AddAnotherMenuItem(BasicMenu basicMenu) {
+				GameObject gameObject = NGUITools.AddChild(basicMenu.m_MenuGrid.gameObject, basicMenu.m_BasicMenuItemPrefab);
+				gameObject.name = "ModSettings MenuItem";
+				BasicMenuItem item = gameObject.GetComponent<BasicMenuItem>();
+				BasicMenu.BasicMenuItemView view = item.m_View;
+				int itemIndex = basicMenu.m_MenuItems.Count;
+				EventDelegate onClick = new EventDelegate(new Action(() => basicMenu.OnItemClicked(itemIndex)));
+				view.m_Button.onClick.Add(onClick);
+				EventDelegate onDoubleClick = new EventDelegate(new Action(() => basicMenu.OnItemDoubleClicked(itemIndex)));
+				view.m_DoubleClickButton.m_OnDoubleClick.Add(onDoubleClick);
+				basicMenu.m_MenuItems.Add(view);
 			}
 		}
 

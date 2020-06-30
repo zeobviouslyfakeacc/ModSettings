@@ -118,8 +118,7 @@ namespace ModSettings {
 			try {
 				OnConfirm();
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler");
-				UnityEngine.Debug.LogException(e);
+				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler\n" + e.ToString());
 			}
 		}
 
@@ -127,8 +126,7 @@ namespace ModSettings {
 			try {
 				OnChange(field, oldValue, newValue);
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnChange handler");
-				UnityEngine.Debug.LogException(e);
+				UnityEngine.Debug.LogError("[ModSettings] Exception in OnChange handler\n" + e.ToString());
 			}
 		}
 

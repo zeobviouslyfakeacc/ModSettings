@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 
 namespace ModSettings {
@@ -21,11 +22,13 @@ namespace ModSettings {
 		}
 
 		private static UIGrid CreateUIGrid(Panel_CustomXPSetup panel) {
-			UIGrid uiGrid = NGUITools.AddChild<UIGrid>(panel.m_ScrollPanelOffsetTransform.gameObject);
+			GameObject child = NGUITools.AddChild(panel.m_ScrollPanelOffsetTransform.gameObject);
+			child.name = "Custom Mode Settings UIGrid";
+			UIGrid uiGrid = child.AddComponent<UIGrid>();
 			uiGrid.arrangement = UIGrid.Arrangement.Vertical;
 			uiGrid.cellHeight = gridCellHeight;
 			uiGrid.hideInactive = true;
-			uiGrid.onReposition = () => ResizeScrollBar(panel, uiGrid);
+			uiGrid.onReposition = new System.Action(() => ResizeScrollBar(panel, uiGrid));
 			return uiGrid;
 		}
 
@@ -94,10 +97,16 @@ namespace ModSettings {
 
 		internal class HinterlandSettingVisibilityListener : MonoBehaviour {
 
+			static HinterlandSettingVisibilityListener() {
+				UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<HinterlandSettingVisibilityListener>();
+			}
+			public HinterlandSettingVisibilityListener(System.IntPtr ptr) : base(ptr) { }
+
 			private bool visible;
 			private Group header;
 			private UIGrid uiGrid;
 
+			[HideFromIl2Cpp]
 			internal void Init(bool visible, Group header, UIGrid uiGrid) {
 				this.visible = visible;
 				this.header = header;
@@ -114,6 +123,7 @@ namespace ModSettings {
 				UpdateVisibility(gameObject.activeSelf);
 			}
 
+			[HideFromIl2Cpp]
 			private void UpdateVisibility(bool newVisible) {
 				if (visible != newVisible) {
 					visible = newVisible;

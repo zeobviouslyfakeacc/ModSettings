@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using Harmony;
 using UnityEngine;
 
 namespace ModSettings {
@@ -17,14 +16,10 @@ namespace ModSettings {
 			Object.Destroy(titleLabel.GetComponent<UILocalize>());
 			titleLabel.GetComponent<UILabel>().text = "Mod Settings";
 
-			GetListReflective(panel, "m_MainMenuItemTabs").Add(tab);
-			GetListReflective(panel, "m_Tabs").Add(tab);
+			panel.m_MainMenuItemTabs.Add(tab);
+			panel.m_Tabs.Add(tab);
 
 			return tab;
-		}
-
-		private static List<GameObject> GetListReflective(Panel_OptionsMenu panel, string fieldName) {
-			return (List<GameObject>) AccessTools.Field(typeof(Panel_OptionsMenu), fieldName).GetValue(panel);
 		}
 
 		private readonly ModSettingsGUI settingsGUI;

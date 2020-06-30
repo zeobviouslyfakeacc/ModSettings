@@ -1,18 +1,29 @@
-﻿using UnityEngine;
+﻿using UnhollowerBaseLib.Attributes;
+using UnityEngine;
 
 namespace ModSettings {
 	internal class DescriptionHolder : MonoBehaviour {
 
-		private string descriptionText;
+		static DescriptionHolder() {
+			UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<DescriptionHolder>();
+		}
+		public DescriptionHolder(System.IntPtr ptr) : base(ptr) { }
 
+		[HideFromIl2Cpp]
 		internal void SetDescription(string description, bool localize) {
 			if (localize) {
-				descriptionText = description;
+				Text = description;
 			} else {
-				descriptionText = Localization.Get(description);
+				Text = Localization.Get(description);
 			}
 		}
 
-		internal string Text => descriptionText;
+		internal string Text {
+			[HideFromIl2Cpp]
+			get;
+
+			[HideFromIl2Cpp]
+			private set;
+		}
 	}
 }

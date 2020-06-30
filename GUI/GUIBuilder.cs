@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using static ModSettings.AttributeFieldTypes;
+using Il2Cpp = Il2CppSystem.Collections.Generic;
 
 namespace ModSettings {
 	internal abstract class GUIBuilder {
@@ -22,9 +23,10 @@ namespace ModSettings {
 			comboBoxPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_CustomXPSetup.m_AllowInteriorSpawnPopupList.gameObject);
 			comboBoxPrefab.SetActive(false);
 
+			UnityEngine.Object.DestroyImmediate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.m_SliderObject.GetComponent<GenericSliderSpawner>());
 			sliderPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.gameObject);
-			UnityEngine.Object.DestroyImmediate(sliderPrefab.GetComponent<ConsoleSlider>().m_SliderObject.GetComponent<GenericSliderSpawner>());
 			sliderPrefab.SetActive(false);
+			sliderPrefab.transform.Find("Label_FOV").localPosition = new Vector3(-10, 0, -1);
 
 			// Fix slider hitbox
 			BoxCollider collider = sliderPrefab.GetComponentInChildren<BoxCollider>();
@@ -33,11 +35,11 @@ namespace ModSettings {
 		}
 
 		protected readonly UIGrid uiGrid;
-		protected readonly List<GameObject> menuItems;
+		protected readonly Il2Cpp.List<GameObject> menuItems;
 
 		protected Header lastHeader;
 
-		protected GUIBuilder(UIGrid uiGrid, List<GameObject> menuItems) {
+		protected GUIBuilder(UIGrid uiGrid, Il2Cpp.List<GameObject> menuItems) {
 			this.uiGrid = uiGrid;
 			this.menuItems = menuItems;
 		}
@@ -105,11 +107,13 @@ namespace ModSettings {
 
 			// Add selectable values
 			comboBox.items.Clear();
-			comboBox.items.AddRange(choice.Names);
+			foreach (string choiceName in choice.Names) {
+				comboBox.items.Add(choiceName);
+			}
 			comboBox.m_Localize = choice.Localize;
 
 			// Add listener and set default value
-			EventDelegate.Set(comboBox.onChange, () => UpdateChoiceValue(modSettings, field, comboBox.GetCurrentIndex()));
+			EventDelegate.Set(comboBox.onChange, new Action(() => UpdateChoiceValue(modSettings, field, comboBox.GetCurrentIndex())));
 			modSettings.AddRefreshAction(() => UpdateChoiceComboBox(modSettings, field, comboBox));
 
 			// Control visibility
@@ -151,7 +155,7 @@ namespace ModSettings {
 			}
 
 			// Add listeners to update setting value
-			EventDelegate.Callback callback = () => UpdateSliderValue(modSettings, field, uiSlider, uiLabel, from, to, numberFormat);
+			EventDelegate.Callback callback = new Action(() => UpdateSliderValue(modSettings, field, uiSlider, uiLabel, from, to, numberFormat));
 			EventDelegate.Set(slider.onChange, callback);
 			EventDelegate.Set(uiSlider.onChange, callback);
 			modSettings.AddRefreshAction(() => UpdateSlider(modSettings, field, uiSlider, uiLabel, from, to, numberFormat));

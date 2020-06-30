@@ -5,26 +5,6 @@ using UnityEngine;
 namespace ModSettings {
 	internal static class CustomModePatches {
 
-		[HarmonyPatch(typeof(Panel_CustomXPSetup), "Start", new Type[0])]
-		private static class BuildCustomModeGUIPatch {
-			private static void Postfix() {
-				DateTime tStart = DateTime.UtcNow;
-
-				try {
-					Debug.Log("[ModSettings] Building Mod Settings GUI");
-					ModSettingsMenu.BuildGUI();
-					Debug.Log("[ModSettings] Building Custom Mode GUI");
-					CustomModeMenu.BuildGUI();
-				} catch (Exception e) {
-					Debug.LogError("[ModSettings] Exception while building GUI");
-					Debug.LogException(e);
-				}
-
-				long timeMillis = (long) (DateTime.UtcNow - tStart).TotalMilliseconds;
-				Debug.Log("[ModSettings] Done! Took " + timeMillis + " ms. Have a nice day!");
-			}
-		}
-
 		[HarmonyPatch(typeof(Panel_CustomXPSetup), "UpdateMenuNavigation")]
 		private static class UpdateCustomModeDescriptionPatch {
 			private static void Postfix(Panel_CustomXPSetup __instance, ref int index) {
