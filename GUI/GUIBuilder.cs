@@ -172,14 +172,17 @@ namespace ModSettings {
 		private void UpdateSliderValue(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
 			float oldValue = Convert.ToSingle(field.GetValue(modSettings));
 			float sliderValue = from + slider.value * (to - from);
-			if (sliderValue == oldValue)
-				return;
 
 			Type fieldType = field.FieldType;
 			if (IsFloatType(fieldType)) {
+				if (sliderValue == oldValue) return;
+
 				SetSettingsField(modSettings, field, Convert.ChangeType(sliderValue, fieldType, null));
 			} else {
+				long oldLongValue = (long) Mathf.Round(oldValue);
 				long longValue = (long) Mathf.Round(sliderValue);
+				if (oldLongValue == longValue) return;
+
 				SetSettingsField(modSettings, field, Convert.ChangeType(longValue, fieldType, null));
 			}
 
