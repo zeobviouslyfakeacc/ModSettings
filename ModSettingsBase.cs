@@ -5,8 +5,8 @@ using System.Reflection;
 namespace ModSettings {
 	public abstract class ModSettingsBase {
 
-		private readonly FieldInfo[] fields;
-		private readonly Dictionary<FieldInfo, object> confirmedValues;
+		internal readonly FieldInfo[] fields;
+		internal readonly Dictionary<FieldInfo, object> confirmedValues;
 		private readonly List<Action> refreshActions;
 
 		private readonly Visibility menuVisibility;
