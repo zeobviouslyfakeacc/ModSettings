@@ -188,7 +188,7 @@ namespace ModSettings {
 
 			UpdateSliderLabel(field, label, sliderValue, numberFormat);
 
-			if (modSettings.IsVisible()) {
+			if (modSettings.IsVisible() && slider.numberOfSteps > 1) {
 				GameAudioManager.PlayGUISlider();
 			}
 		}
