@@ -117,7 +117,7 @@ namespace ModSettings {
 			UpdateDescriptionLabel();
 
 			if (currentTab.scrollBarHeight > 0) {
-				float scroll = Input.GetAxis("Mouse ScrollWheel");
+				float scroll = InputManager.GetAxisScrollWheel(InterfaceManager.m_Panel_OptionsMenu);
 				float scrollAmount = 60f / currentTab.scrollBarHeight;
 				if (scroll < 0) {
 					scrollBarSlider.value += scrollAmount;
