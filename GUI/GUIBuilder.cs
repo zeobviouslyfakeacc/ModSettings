@@ -164,29 +164,21 @@ namespace ModSettings {
 			float defaultValue = Convert.ToSingle(field.GetValue(modSettings));
 			uiSlider.value = (defaultValue - from) / (to - from);
 			uiSlider.numberOfSteps = numberOfSteps;
+			UpdateSliderLabel(field, uiLabel, defaultValue, numberFormat);
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
 		}
 
 		private void UpdateSliderValue(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
-			float oldValue = Convert.ToSingle(field.GetValue(modSettings));
 			float sliderValue = from + slider.value * (to - from);
-
-			Type fieldType = field.FieldType;
-			if (IsFloatType(fieldType)) {
-				if (sliderValue == oldValue) return;
-
-				SetSettingsField(modSettings, field, Convert.ChangeType(sliderValue, fieldType, null));
-			} else {
-				long oldLongValue = (long) Mathf.Round(oldValue);
-				long longValue = (long) Mathf.Round(sliderValue);
-				if (oldLongValue == longValue) return;
-
-				SetSettingsField(modSettings, field, Convert.ChangeType(longValue, fieldType, null));
+			if (SliderMatchesField(modSettings, field, sliderValue)) return;
+			if (IsIntegerType(field.FieldType)) {
+				sliderValue = Mathf.Round(sliderValue);
 			}
 
 			UpdateSliderLabel(field, label, sliderValue, numberFormat);
+			SetSettingsField(modSettings, field, Convert.ChangeType(sliderValue, field.FieldType, null));
 
 			if (modSettings.IsVisible() && slider.numberOfSteps > 1) {
 				GameAudioManager.PlayGUISlider();
@@ -194,9 +186,23 @@ namespace ModSettings {
 		}
 
 		private static void UpdateSlider(ModSettingsBase modSettings, FieldInfo field, UISlider slider, UILabel label, float from, float to, string numberFormat) {
+			float sliderValue = from + slider.value * (to - from);
+			if (SliderMatchesField(modSettings, field, sliderValue)) return;
+
 			float value = Convert.ToSingle(field.GetValue(modSettings));
 			slider.value = (value - from) / (to - from);
 			UpdateSliderLabel(field, label, value, numberFormat);
+		}
+
+		private static bool SliderMatchesField(ModSettingsBase modSettings, FieldInfo field, float sliderValue) {
+			if (IsFloatType(field.FieldType)) {
+				float oldValue = Convert.ToSingle(field.GetValue(modSettings));
+				return sliderValue == oldValue;
+			} else {
+				long oldValue = Convert.ToInt64(field.GetValue(modSettings));
+				long longValue = (long) Mathf.Round(sliderValue);
+				return oldValue == longValue;
+			}
 		}
 
 		private static void UpdateSliderLabel(FieldInfo field, UILabel label, float value, string numberFormat) {
