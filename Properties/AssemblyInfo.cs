@@ -14,5 +14,5 @@ using MelonLoader;
 [assembly: Guid("17c6ec09-2c53-4636-883c-9213e4300426")]
 [assembly: AssemblyVersion("1.6.0.0")]
 [assembly: AssemblyFileVersion("1.6.0.0")]
-[assembly: MelonModInfo(typeof(ModSettings.ModSettingsMod), "ModSettings", "1.6", "zeobviouslyfakeacc")]
-[assembly: MelonModGame("Hinterland", "TheLongDark")]
+[assembly: MelonInfo(typeof(ModSettings.ModSettingsMod), "ModSettings", "1.6", "zeobviouslyfakeacc")]
+[assembly: MelonGame("Hinterland", "TheLongDark")]

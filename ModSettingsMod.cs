@@ -10,7 +10,7 @@ namespace ModSettings {
 			ModSettingsExample.OnChangeExample.OnLoad();
 			ModSettingsExample.VisibilityExample.OnLoad();
 #endif
-			Debug.Log($"[{InfoAttribute.Name}] version {InfoAttribute.Version} loaded!");
+			Debug.Log($"[{Info.Name}] version {Info.Version} loaded!");
 		}
 	}
 }
