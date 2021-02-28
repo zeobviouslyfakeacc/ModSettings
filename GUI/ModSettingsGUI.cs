@@ -15,6 +15,7 @@ namespace ModSettings {
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
 		private ModTab currentTab = null;
 		private int selectedIndex = 0;
+		private string previousMod = "";
 
 		private ConsoleComboBox modSelector;
 		private UIPanel scrollPanel;
@@ -200,15 +201,23 @@ namespace ModSettings {
 			if (modSelector.items.Count > 0) {
 				modSelector.items.Sort();
 
-				string firstMod = modSelector.items[0];
-				modSelector.value = firstMod;
-				SelectMod(firstMod);
+				if (modSelector.items.Contains(previousMod))
+				{
+					modSelector.value = previousMod;
+					SelectMod(previousMod);
+				}
+				else
+				{
+					string firstMod = modSelector.items[0];
+					modSelector.value = firstMod;
+					SelectMod(firstMod);
+				}
 			}
 		}
 
 		private void OnDisable() {
 			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: false);
-
+			previousMod = modSelector?.value;
 			foreach (ModTab tab in modTabs.Values) {
 				tab.requiresConfirmation = false;
 			}
