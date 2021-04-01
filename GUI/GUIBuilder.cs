@@ -13,6 +13,7 @@ namespace ModSettings {
 		private static readonly GameObject headerLabelPrefab;
 		private static readonly GameObject sliderPrefab;
 		private static readonly GameObject comboBoxPrefab;
+		private static readonly GameObject keyEntryPrefab;
 
 		static GUIBuilder() {
 			Transform firstSection = InterfaceManager.m_Panel_CustomXPSetup.m_ScrollPanelOffsetTransform.GetChild(0);
@@ -22,6 +23,9 @@ namespace ModSettings {
 
 			comboBoxPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_CustomXPSetup.m_AllowInteriorSpawnPopupList.gameObject);
 			comboBoxPrefab.SetActive(false);
+
+			keyEntryPrefab = MakeKeyEntryPrefab();
+			keyEntryPrefab.SetActive(false);
 
 			UnityEngine.Object.DestroyImmediate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.m_SliderObject.GetComponent<GenericSliderSpawner>());
 			sliderPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.gameObject);
@@ -44,6 +48,32 @@ namespace ModSettings {
 			this.menuItems = menuItems;
 		}
 
+		private static GameObject MakeKeyEntryPrefab() {
+			GameObject result = GameObject.Instantiate(comboBoxPrefab);
+
+			Transform rebindingTab = InterfaceManager.m_Panel_OptionsMenu.m_RebindingTab.transform;
+			GameObject originalButton = rebindingTab?.FindChild("GameObject")?.FindChild("LeftSide")?.FindChild("Button_Rebinding")?.gameObject;
+			GameObject keybindingButton = GameObject.Instantiate(originalButton);
+
+			keybindingButton.transform.position = result.transform.FindChild("Label_Value").position;
+			keybindingButton.transform.parent = result.transform;
+			keybindingButton.name = "Keybinding_Button";
+
+			GameObject.DestroyImmediate(result.GetComponent<ConsoleComboBox>());
+			DestroyChild(result, "Button_Decrease");
+			DestroyChild(result, "Button_Increase");
+			DestroyChild(result, "Label_Value");
+
+			DestroyChild(keybindingButton, "Label_Name");
+
+			return result;
+		}
+
+		private static void DestroyChild(GameObject parent, string childName) {
+			GameObject child = parent?.transform?.FindChild(childName)?.gameObject;
+			if(child) GameObject.DestroyImmediate(child);
+		}
+
 		internal virtual void AddSettings(ModSettingsBase modSettings) {
 			foreach (FieldInfo field in modSettings.GetFields()) {
 				Attributes.GetAttributes(field, out SectionAttribute section, out NameAttribute name,
@@ -63,7 +93,9 @@ namespace ModSettings {
 					// No Slider or Choice annotation, determine GUI object from field type
 					Type fieldType = field.FieldType;
 
-					if (fieldType.IsEnum) {
+					if (fieldType == typeof(UnityEngine.KeyCode)) {
+						AddKeySetting(modSettings, field, name, description);
+					} else if (fieldType.IsEnum) {
 						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.ForEnumType(fieldType));
 					} else if (fieldType == typeof(bool)) {
 						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.YesNoAttribute);
@@ -98,6 +130,35 @@ namespace ModSettings {
 		private void AddPaddingHeader() {
 			GameObject padding = NGUITools.AddChild(uiGrid.gameObject);
 			lastHeader = new Header(padding);
+		}
+
+		private void AddKeySetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description) {
+			// Create menu item
+			GameObject setting = CreateSetting(name, description, keyEntryPrefab, "Label");
+			GameObject keyButtonObject = setting.transform.FindChild("Keybinding_Button").gameObject;
+
+			CustomKeybinding customKeybinding = setting.AddComponent<CustomKeybinding>();
+			customKeybinding.keyRebindingButton = keyButtonObject.GetComponent<KeyRebindingButton>();
+			customKeybinding.currentKeycodeSetting = (KeyCode)field.GetValue(modSettings);
+			customKeybinding.RefreshLabelValue();
+
+			UIButton uiButton = keyButtonObject.GetComponent<UIButton>();
+			EventDelegate.Set(uiButton.onClick, new Action(customKeybinding.OnClick));
+			customKeybinding.OnChange = new Action(() => UpdateKeyValue(modSettings, field, customKeybinding));
+			modSettings.AddRefreshAction(() => UpdateKeyChoice(modSettings, field, customKeybinding));
+
+			// Control visibility
+			SetVisibilityListener(modSettings, field, setting, lastHeader);
+		}
+
+		private void UpdateKeyValue(ModSettingsBase modSettings, FieldInfo field, CustomKeybinding customKeybinding) {
+			SetSettingsField(modSettings, field, customKeybinding.currentKeycodeSetting);
+		}
+
+		private void UpdateKeyChoice(ModSettingsBase modSettings, FieldInfo field, CustomKeybinding customKeybinding) {
+			KeyCode keyCode = (KeyCode)field.GetValue(modSettings);
+			customKeybinding.currentKeycodeSetting = keyCode;
+			customKeybinding.keyRebindingButton.SetValueLabel(keyCode.ToString());
 		}
 
 		private void AddChoiceSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, ChoiceAttribute choice) {
