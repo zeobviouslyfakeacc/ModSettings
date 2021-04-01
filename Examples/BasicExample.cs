@@ -39,6 +39,10 @@ namespace ModSettingsExample {
 		[Slider(-5, 5)] // -5, -4, ..., 4, 5
 		public int intSliderValue = 1;
 
+		[Name("Test Keybinding")]
+		[Description("Click to set the keybinding.")]
+		public UnityEngine.KeyCode keyCode = KeyCode.Y;
+
 		/*
 		 * This method is called whenever the user presses the confirm button in the
 		 * custom experience mode panel or in the mod settings panel.

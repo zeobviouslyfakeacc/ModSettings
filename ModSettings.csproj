@@ -68,6 +68,7 @@
     <Compile Include="Examples\BasicExample.cs" />
     <Compile Include="Examples\OnChangeExample.cs" />
     <Compile Include="Examples\VisibilityExample.cs" />
+    <Compile Include="GUI\CustomKeybinding.cs" />
     <Compile Include="GUI\CustomModeGUIBuilder.cs" />
     <Compile Include="GUI\CustomModePatches.cs" />
     <Compile Include="GUI\DescriptionHolder.cs" />

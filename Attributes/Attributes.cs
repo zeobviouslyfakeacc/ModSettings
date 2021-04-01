@@ -60,7 +60,7 @@ namespace ModSettings {
 				throw new ArgumentException("[ModSettings] Field type " + fieldType.Name + " is not supported", field.Name);
 			}
 
-			if (fieldType.IsEnum) {
+			if (fieldType.IsEnum && fieldType != typeof(UnityEngine.KeyCode)) {
 				ValidateEnum(field, fieldType);
 			}
 		}
