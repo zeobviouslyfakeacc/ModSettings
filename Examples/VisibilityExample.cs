@@ -12,8 +12,8 @@ namespace ModSettingsExample {
 		[Section("Visibility Example")]
 		[Name("Number of visible custom settings")]
 		[Description("... in the \"Custom GUI Examples\" section below")]
-		[Slider(0, 7)]
-		public int visibleSettingsCount = 7;
+		[Slider(0, 8)]
+		public int visibleSettingsCount = 8;
 
 		/*
 		 * This method is called whenever a field in this object is changed.

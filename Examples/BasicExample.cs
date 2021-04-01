@@ -57,6 +57,7 @@ namespace ModSettingsExample {
 			Debug.Log("steplessSliderValue = " + steplessSliderValue);
 			Debug.Log("steppedSliderValue = " + steppedSliderValue);
 			Debug.Log("intSliderValue = " + intSliderValue);
+			Debug.Log("keyCode = " + keyCode.ToString());
 		}
 	}
 
