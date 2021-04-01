@@ -95,7 +95,7 @@ namespace ModSettings {
 
 					if (fieldType == typeof(UnityEngine.KeyCode)) {
 						AddKeySetting(modSettings, field, name, description);
-                    } else if (fieldType.IsEnum) {
+					} else if (fieldType.IsEnum) {
 						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.ForEnumType(fieldType));
 					} else if (fieldType == typeof(bool)) {
 						AddChoiceSetting(modSettings, field, name, description, ChoiceAttribute.YesNoAttribute);
