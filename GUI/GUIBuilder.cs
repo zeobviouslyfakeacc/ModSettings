@@ -145,7 +145,7 @@ namespace ModSettings {
 			UIButton uiButton = keyButtonObject.GetComponent<UIButton>();
 			EventDelegate.Set(uiButton.onClick, new Action(customKeybinding.OnClick));
 			customKeybinding.OnChange = new Action(() => UpdateKeyValue(modSettings, field, customKeybinding));
-			modSettings.AddRefreshAction(() => UpdateKeyChoice(modSettings, field, customKeybinding.keyRebindingButton));
+			modSettings.AddRefreshAction(() => UpdateKeyChoice(modSettings, field, customKeybinding));
 
 			// Control visibility
 			SetVisibilityListener(modSettings, field, setting, lastHeader);
@@ -155,9 +155,10 @@ namespace ModSettings {
 			SetSettingsField(modSettings, field, customKeybinding.currentKeycodeSetting);
 		}
 
-		private void UpdateKeyChoice(ModSettingsBase modSettings, FieldInfo field, KeyRebindingButton rebindingButton) {
+		private void UpdateKeyChoice(ModSettingsBase modSettings, FieldInfo field, CustomKeybinding customKeybinding) {
 			KeyCode keyCode = (KeyCode)field.GetValue(modSettings);
-			rebindingButton.SetValueLabel(keyCode.ToString());
+			customKeybinding.currentKeycodeSetting = keyCode;
+			customKeybinding.keyRebindingButton.SetValueLabel(keyCode.ToString());
 		}
 
 		private void AddChoiceSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, ChoiceAttribute choice) {
