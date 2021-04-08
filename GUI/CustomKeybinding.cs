@@ -32,6 +32,15 @@ namespace ModSettings {
 
         [HideFromIl2Cpp]
         private void MaybeUpdateKey() {
+            if (InputManager.GetKeyDown(InputManager.m_CurrentContext, KeyCode.Backspace))
+            {
+                currentKeycodeSetting = KeyCode.None;
+                searchingForKey = false;
+                keyRebindingButton.SetSelected(false);
+                keyRebindingButton.SetValueLabel(KeyCode.None.ToString());
+                OnChange.Invoke();
+                return;
+            }
             foreach (KeyCode kcode in System.Enum.GetValues(typeof(KeyCode))) {
                 if (InputManager.GetKeyDown(InputManager.m_CurrentContext, kcode)) {
                     currentKeycodeSetting = kcode;
