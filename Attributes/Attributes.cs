@@ -6,7 +6,7 @@ namespace ModSettings {
 	internal static class Attributes {
 
 		internal static void GetAttributes(FieldInfo field, out SectionAttribute section, out NameAttribute name,
-		                                   out DescriptionAttribute description, out SliderAttribute slider, out ChoiceAttribute choice) {
+										   out DescriptionAttribute description, out SliderAttribute slider, out ChoiceAttribute choice) {
 			// Must be assigned at least once, so assign to null first
 			section = null;
 			name = null;

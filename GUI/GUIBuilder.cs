@@ -72,7 +72,7 @@ namespace ModSettings {
 		private static void DestroyChild(GameObject parent, string childName) {
 			GameObject child = parent?.transform?.FindChild(childName)?.gameObject;
 			if(child) GameObject.DestroyImmediate(child);
-        }
+		}
 
 		internal virtual void AddSettings(ModSettingsBase modSettings) {
 			foreach (FieldInfo field in modSettings.GetFields()) {
