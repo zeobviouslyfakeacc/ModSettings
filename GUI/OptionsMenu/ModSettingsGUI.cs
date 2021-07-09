@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using ModSettings.Scripts;
+using System.Collections.Generic;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using Il2Cpp = Il2CppSystem.Collections.Generic;
 
 namespace ModSettings {
 	internal class ModSettingsGUI : MonoBehaviour {
-
-		static ModSettingsGUI() {
-			UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<ModSettingsGUI>();
-		}
-
+		static ModSettingsGUI() => UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<ModSettingsGUI>();
 		public ModSettingsGUI(System.IntPtr ptr) : base(ptr) { }
 
 		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
@@ -94,7 +91,7 @@ namespace ModSettings {
 			scrollbar.name = "Scrollbar";
 			scrollbar.transform.localPosition = new Vector2(415, -40);
 
-			int height = (int) scrollPanel.height;
+			int height = (int)scrollPanel.height;
 			UISlider slider = scrollbar.GetComponentInChildren<UISlider>(true);
 			slider.backgroundWidget.GetComponent<UISprite>().height = height;
 			slider.foregroundWidget.GetComponent<UISprite>().height = height;
@@ -113,7 +110,8 @@ namespace ModSettings {
 				return;
 			}
 
-			InterfaceManager.m_Panel_OptionsMenu.UpdateMenuNavigationGeneric(ref selectedIndex, currentTab.menuItems);
+			if (!ModSettingsMenu.disableMovementInput)
+				InterfaceManager.m_Panel_OptionsMenu.UpdateMenuNavigationGeneric(ref selectedIndex, currentTab.menuItems);
 			EnsureSelectedSettingVisible();
 			UpdateDescriptionLabel();
 
@@ -148,6 +146,13 @@ namespace ModSettings {
 
 			ResizeScrollBar(currentTab);
 			EnsureSelectedSettingVisible();
+			CallOnSelect(currentTab);
+		}
+
+		[HideFromIl2Cpp]
+		private void CallOnSelect(ModTab modTab) {
+			foreach (ModSettingsBase settings in modTab.modSettings)
+				settings.CallOnSelect();
 		}
 
 		[HideFromIl2Cpp]
@@ -288,7 +293,7 @@ namespace ModSettings {
 				modTab.scrollBarHeight = height - scrollPanel.height;
 
 				ScrollbarThumbResizer thumbResizer = scrollBarSlider.GetComponent<ScrollbarThumbResizer>();
-				thumbResizer.SetNumSteps((int) scrollPanel.height, (int) height);
+				thumbResizer.SetNumSteps((int)scrollPanel.height, (int)height);
 
 				scrollBarSlider.value = Mathf.Clamp01(absoluteVal / Mathf.Max(1, modTab.scrollBarHeight));
 				OnScroll(scrollBarSlider, false);

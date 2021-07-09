@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
-using ModSettings;
 
-namespace ModSettingsExample {
+namespace ModSettings.Examples {
 #if DEBUG // Change build profile to Debug to enable or Release to disable this example
 
 	/*
@@ -12,8 +11,8 @@ namespace ModSettingsExample {
 		[Section("Visibility Example")]
 		[Name("Number of visible custom settings")]
 		[Description("... in the \"Custom GUI Examples\" section below")]
-		[Slider(0, 8)]
-		public int visibleSettingsCount = 8;
+		[Slider(0, 9)]
+		public int visibleSettingsCount = 9;
 
 		/*
 		 * This method is called whenever a field in this object is changed.
@@ -22,9 +21,18 @@ namespace ModSettingsExample {
 		protected override void OnChange(FieldInfo field, object oldValue, object newValue) {
 			// We already know there's just one field, but let's be pretend we don't
 			if (field.Name == nameof(visibleSettingsCount)) {
-				int visible = (int) newValue;
+				int visible = (int)newValue;
 				VisibilityExample.SetFieldsVisible(visible);
 			}
+		}
+
+		/*
+		 * This method is called every time this particular settings page is opened.
+		 * The method is not marked abstract, so you don't have to override it if you don't need it.
+		 */
+		protected override void OnSelect() {
+			VisibilityExample.SetFieldsVisible(visibleSettingsCount); //Set the correct number of settings visible
+			base.OnSelect(); //Let the base refresh the GUI
 		}
 	}
 

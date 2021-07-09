@@ -8,13 +8,12 @@ using UnityEngine;
 namespace ModSettings {
 	public abstract class JsonModSettings : ModSettingsBase {
 
-		private static readonly string MODS_DIRECTORY = Path.GetFullPath(typeof(MelonLoader.MelonMod).Assembly.Location + @"\..\..\Mods");
+		private static readonly string MODS_DIRECTORY = Path.Combine(MelonLoader.MelonUtils.GameDirectory, @"Mods");
 
 		protected readonly string modName;
 		protected readonly string jsonPath;
 
-		public JsonModSettings() : this(null) {
-		}
+		public JsonModSettings() : this(null) { }
 
 		public JsonModSettings(string relativeJsonFilePath) {
 			modName = GetType().Assembly.GetName().Name;
@@ -38,9 +37,8 @@ namespace ModSettings {
 			return Path.Combine(MODS_DIRECTORY, relativePath);
 		}
 
-		protected override void OnConfirm() {
-			Save();
-		}
+		/// <summary>Called when the confirm button is pressed. By default, this method saves your settings to file.</summary>
+		protected override void OnConfirm() => Save();
 
 		public void Save() {
 			try {
@@ -48,7 +46,7 @@ namespace ModSettings {
 				File.WriteAllText(jsonPath, json, Encoding.UTF8);
 				Debug.Log($"[{modName}] Config file saved to {jsonPath}");
 			} catch (Exception ex) {
-				Debug.LogError($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
+				MelonLoader.MelonLogger.Error($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
 			}
 		}
 
@@ -63,7 +61,7 @@ namespace ModSettings {
 					confirmedValues[field] = field.GetValue(this);
 				}
 			} catch (Exception ex) {
-				Debug.LogError($"[{modName}] Error while trying to read config file {jsonPath}: {ex}");
+				MelonLoader.MelonLogger.Error($"[{modName}] Error while trying to read config file {jsonPath}: {ex}");
 
 				// Re-throw to make error show up in main menu
 				throw new IOException($"Error while trying to read config file {jsonPath}", ex);
@@ -74,7 +72,7 @@ namespace ModSettings {
 			if (File.Exists(jsonPath)) {
 				Reload();
 			} else {
-				Debug.Log($"[{modName}] Settings file {jsonPath} did not exist, writing default settings file");
+				MelonLoader.MelonLogger.Msg($"[{modName}] Settings file {jsonPath} did not exist, writing default settings file");
 
 				// All default field values are now confirmed values
 				foreach (FieldInfo field in fields) {

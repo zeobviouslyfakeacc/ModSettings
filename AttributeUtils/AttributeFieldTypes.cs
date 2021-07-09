@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Harmony;
 
-namespace ModSettings {
+namespace ModSettings.AttributeUtils {
 	internal static class AttributeFieldTypes {
 
 		private static readonly HashSet<Type> integerTypes = new HashSet<Type>() {
@@ -32,14 +31,14 @@ namespace ModSettings {
 			if (numericType == typeof(bool))
 				return 1L;
 			else
-				return Convert.ToInt64(AccessTools.Field(numericType, "MaxValue").GetValue(null));
+				return Convert.ToInt64(HarmonyLib.AccessTools.Field(numericType, "MaxValue").GetValue(null));
 		}
 
 		internal static long MinValue(Type numericType) {
 			if (numericType == typeof(bool))
 				return 0L;
 			else
-				return Convert.ToInt64(AccessTools.Field(numericType, "MinValue").GetValue(null));
+				return Convert.ToInt64(HarmonyLib.AccessTools.Field(numericType, "MinValue").GetValue(null));
 		}
 	}
 }

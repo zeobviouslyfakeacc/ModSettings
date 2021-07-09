@@ -1,4 +1,5 @@
 ﻿using MelonLoader;
+using ModSettings.Examples;
 using UnityEngine;
 
 namespace ModSettings {
@@ -6,9 +7,11 @@ namespace ModSettings {
 
 		public override void OnApplicationStart() {
 #if DEBUG
-			ModSettingsExample.BasicExample.OnLoad();
-			ModSettingsExample.OnChangeExample.OnLoad();
-			ModSettingsExample.VisibilityExample.OnLoad();
+			BasicExample.OnLoad();
+			OnChangeExample.OnLoad();
+			VisibilityExample.OnLoad();
+			DynamicExample.OnLoad();
+			CustomChoiceBoxExample.OnLoad();
 #endif
 			Debug.Log($"[{Info.Name}] version {Info.Version} loaded!");
 		}

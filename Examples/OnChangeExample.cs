@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-using ModSettings;
+﻿using System;
+using System.Reflection;
 
-namespace ModSettingsExample {
+namespace ModSettings.Examples {
 #if DEBUG // Change build profile to Debug to enable or Release to disable this example
 
 	/*
@@ -21,20 +21,64 @@ namespace ModSettingsExample {
 		[Name("Slider 3")]
 		public float slider3 = 1f / 3f;
 
+		[Section] //Adds a padding header, i.e. a spacer
+		[Name("Highest")]
+		[Display]
+		public string highestSlider = "";
+
+		[Name("Lowest")]
+		[Display] //Display settings are just for showing information
+		public string lowestSlider = "";
+
 		/*
 		 * This method is called whenever a field in this object is changed.
 		 * The method is not marked abstract, so you don't have to override it if you don't need it.
 		 */
 		protected override void OnChange(FieldInfo field, object oldValue, object newValue) {
 			if (field.Name == nameof(preset)) {
-				UsePreset((int) newValue);
+				UsePreset((int)newValue);
 			} else {
 				FixSliders(field.Name);
 				preset = 0; // Custom
 			}
 
+			// Set the display variables with the new high and low
+			SetHighest();
+			SetLowest();
+
 			// Call this method to make the newly set field values show up in the GUI!
 			RefreshGUI();
+		}
+
+		/*
+		 * This method is called every time this particular settings page is opened.
+		 * The method is not marked abstract, so you don't have to override it if you don't need it.
+		 */
+		protected override void OnSelect() {
+			//These are called to correct the display values when the settings are opened.
+			SetHighest();
+			SetLowest();
+
+			// We need to refresh the GUI so that the new display values show.
+			// Alternatively, we could call base.OnSelect() which does this also.
+			RefreshGUI();
+		}
+
+		private float Max(float value1, float value2, float value3) => Math.Max(Math.Max(value1, value2), value3);
+		private float Min(float value1, float value2, float value3) => Math.Min(Math.Min(value1, value2), value3);
+
+		private void SetHighest() {
+			float max = Max(slider1, slider2, slider3);
+			if (slider1 == max) highestSlider = "Slider 1";
+			else if (slider2 == max) highestSlider = "Slider 2";
+			else highestSlider = "Slider 3";
+		}
+
+		private void SetLowest() {
+			float min = Min(slider1, slider2, slider3);
+			if (slider3 == min) lowestSlider = "Slider 3";
+			else if (slider2 == min) lowestSlider = "Slider 2";
+			else lowestSlider = "Slider 1";
 		}
 
 		private void FixSliders(string sliderName) {

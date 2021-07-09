@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModSettings.AttributeUtils;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -40,7 +41,7 @@ namespace ModSettings {
 				fieldVisibilities.Add(field, new Visibility(visibility));
 			}
 
-			Attributes.ValidateFields(this);
+			AttributeValidation.ValidateFields(this);
 		}
 
 		public void AddToCustomModeMenu(Position position) {
@@ -53,6 +54,48 @@ namespace ModSettings {
 
 		public void AddToModSettings(string modName, MenuType menuType) {
 			ModSettingsMenu.RegisterSettings(this, modName, menuType);
+		}
+
+		internal virtual void MakeGUIContents(GUIBuilder guiBuilder) {
+			foreach (FieldInfo field in this.GetFields()) {
+				if (AttributeScraper.HasAttribute<HideFromModSettingsAttribute>(field))
+					continue;
+
+				AttributeScraper.GetAttributes(field, out SectionAttribute section, out NameAttribute name, out DescriptionAttribute description,
+						out SliderAttribute slider, out ChoiceAttribute choice, out DisplayAttribute display, out TextBoxAttribute textBox);
+
+				if (section != null) {
+					if (string.IsNullOrWhiteSpace(section.Title)) guiBuilder.AddPaddingHeader();
+					else guiBuilder.AddHeader(section);
+				} else if (guiBuilder.lastHeader == null)
+					guiBuilder.AddPaddingHeader();
+
+				if (slider != null)
+					guiBuilder.AddSliderSetting(this, field, name, description, slider);
+				else if (choice != null)
+					guiBuilder.AddChoiceSetting(this, field, name, description, choice);
+				else if (display != null)
+					guiBuilder.AddDisplaySetting(this, field, name, description);
+				else if (textBox != null)
+					guiBuilder.AddTextBoxSetting(this, field, name, description);
+				else {
+					// No Slider or Choice annotation, determine GUI object from field type
+					Type fieldType = field.FieldType;
+
+					if (fieldType == typeof(UnityEngine.KeyCode))
+						guiBuilder.AddKeySetting(this, field, name, description);
+					else if (fieldType.IsEnum)
+						guiBuilder.AddChoiceSetting(this, field, name, description, ChoiceAttribute.ForEnumType(fieldType));
+					else if (fieldType == typeof(bool))
+						guiBuilder.AddChoiceSetting(this, field, name, description, ChoiceAttribute.YesNoAttribute);
+					else if (AttributeFieldTypes.IsFloatType(fieldType))
+						guiBuilder.AddSliderSetting(this, field, name, description, SliderAttribute.DefaultFloatRange);
+					else if (AttributeFieldTypes.IsIntegerType(fieldType))
+						guiBuilder.AddSliderSetting(this, field, name, description, SliderAttribute.DefaultIntRange);
+					else
+						throw new ArgumentException("Unsupported field type: " + fieldType.Name);
+				}
+			}
 		}
 
 		public void RefreshGUI() {
@@ -98,23 +141,38 @@ namespace ModSettings {
 			GetFieldVisibility(field).SetVisible(visible);
 		}
 
-		internal void SetFieldValue(FieldInfo field, object newValue) {
+		/// <returns>True if changed. False otherwise</returns>
+		internal bool SetFieldValue(FieldInfo field, object newValue) {
 			object oldValue = field.GetValue(this);
 			if (oldValue != newValue) {
 				field.SetValue(this, newValue);
 				CallOnChange(field, oldValue, newValue);
-			}
+				return true;
+			} else return false;
 		}
 
+		/// <summary>Called when this settings menu is selected. By default, this method refreshes the GUI.</summary>
+		protected virtual void OnSelect() => RefreshGUI();
+
+		/// <summary>Called when the confirm button is pressed. By default, this method does nothing.</summary>
 		protected virtual void OnConfirm() { }
 
+		/// <summary>Called when the a value is changed. By default, this method does nothing.</summary>
 		protected virtual void OnChange(FieldInfo field, object oldValue, object newValue) { }
+
+		internal void CallOnSelect() {
+			try {
+				OnSelect();
+			} catch (Exception e) {
+				MelonLoader.MelonLogger.Error("Exception in OnSelect handler\n" + e.ToString());
+			}
+		}
 
 		internal void CallOnConfirm() {
 			try {
 				OnConfirm();
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler\n" + e.ToString());
+				MelonLoader.MelonLogger.Error("Exception in OnConfirm handler\n" + e.ToString());
 			}
 
 			foreach (FieldInfo field in fields) {
@@ -126,7 +184,7 @@ namespace ModSettings {
 			try {
 				OnChange(field, oldValue, newValue);
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnChange handler\n" + e.ToString());
+				MelonLoader.MelonLogger.Error("Exception in OnChange handler\n" + e.ToString());
 			}
 		}
 
@@ -148,7 +206,7 @@ namespace ModSettings {
 			return fields;
 		}
 
-		private FieldInfo GetFieldForName(string fieldName) {
+		protected FieldInfo GetFieldForName(string fieldName) {
 			if (string.IsNullOrEmpty(fieldName)) {
 				throw new ArgumentException("[ModSettings] Field name must be a non-empty string", "fieldName");
 			}

@@ -1,8 +1,8 @@
-﻿using System;
-using Harmony;
+﻿using HarmonyLib;
+using System;
 using UnityEngine;
 
-namespace ModSettings {
+namespace ModSettings.Patches {
 
 	internal static class ModSettingsPatches {
 
@@ -14,22 +14,22 @@ namespace ModSettings {
 				DateTime tStart = DateTime.UtcNow;
 
 				try {
-					Debug.Log("[ModSettings] Building Mod Settings GUI");
+					MelonLoader.MelonLogger.Msg("Building Mod Settings GUI");
 					ModSettingsMenu.BuildGUI();
 				} catch (Exception e) {
-					Debug.LogError("[ModSettings] Exception while building Mod Settings GUI\n" + e.ToString());
+					MelonLoader.MelonLogger.Error("Exception while building Mod Settings GUI\n" + e.ToString());
 					return;
 				}
 				try {
 					Debug.Log("[ModSettings] Building Custom Mode GUI");
 					CustomModeMenu.BuildGUI();
 				} catch (Exception e) {
-					Debug.LogError("[ModSettings] Exception while building Custom Mode GUI\n" + e.ToString());
+					MelonLoader.MelonLogger.Error("Exception while building Custom Mode GUI\n" + e.ToString());
 					return;
 				}
 
-				long timeMillis = (long) (DateTime.UtcNow - tStart).TotalMilliseconds;
-				Debug.Log("[ModSettings] Done! Took " + timeMillis + " ms. Have a nice day!");
+				long timeMillis = (long)(DateTime.UtcNow - tStart).TotalMilliseconds;
+				MelonLoader.MelonLogger.Msg("Done! Took " + timeMillis + " ms. Have a nice day!");
 			}
 		}
 

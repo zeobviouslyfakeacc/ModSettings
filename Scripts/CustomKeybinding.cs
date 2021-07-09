@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnhollowerBaseLib.Attributes;
+﻿using UnhollowerBaseLib.Attributes;
+using UnityEngine;
 
-namespace ModSettings {
+namespace ModSettings.Scripts {
 	internal class CustomKeybinding : MonoBehaviour {
 		static CustomKeybinding() => UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<CustomKeybinding>();
 		public CustomKeybinding(System.IntPtr intPtr) : base(intPtr) { }
@@ -27,6 +27,8 @@ namespace ModSettings {
 			}
 
 			searchingForKey = true;
+			InputManager.PushContext(this);
+			ModSettingsMenu.disableMovementInput = true;
 			keyRebindingButton.SetSelected(true);
 			keyRebindingButton.SetValueLabel(string.Empty);
 			GameAudioManager.PlayGUIButtonClick();
@@ -44,6 +46,8 @@ namespace ModSettings {
 
 			currentKeycodeSetting = pressedKey.Value;
 			searchingForKey = false;
+			InputManager.PopContext(this);
+			ModSettingsMenu.disableMovementInput = false;
 			ignoreNextOnClick = (currentKeycodeSetting >= KeyCode.Mouse0 && currentKeycodeSetting <= KeyCode.Mouse6);
 			keyRebindingButton.SetSelected(false);
 			keyRebindingButton.SetValueLabel(pressedKey.ToString());

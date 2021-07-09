@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModSettings {
+namespace ModSettings.Groups {
 	internal abstract class Group {
 
 		private int children;

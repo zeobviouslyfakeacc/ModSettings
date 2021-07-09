@@ -1,8 +1,7 @@
-﻿using ModSettings;
-using UnityEngine;
+﻿using UnityEngine;
 using static CustomExperienceModeManager;
 
-namespace ModSettingsExample {
+namespace ModSettings.Examples {
 #if DEBUG // Change build profile to Debug to enable or Release to disable this example
 
 	internal class ExampleSettings : ModSettingsBase {
@@ -40,8 +39,13 @@ namespace ModSettingsExample {
 		public int intSliderValue = 1;
 
 		[Name("Custom Key Binding")]
-		[Description("Click to set the keybinding.")]
+		[Description("Click to set the keybinding")]
 		public UnityEngine.KeyCode keyCode = KeyCode.Y;
+
+		[Name("Text Box")]
+		[Description("Click to start typing. Press enter or click away to submit changes.")]
+		[TextBox] //must have the attribute
+		public string customTextBox = "Test Text";//must be string and initialized as non-whitespace
 
 		/*
 		 * This method is called whenever the user presses the confirm button in the

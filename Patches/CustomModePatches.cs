@@ -1,8 +1,9 @@
-﻿using System;
-using Harmony;
+﻿using HarmonyLib;
+using ModSettings.Scripts;
+using System;
 using UnityEngine;
 
-namespace ModSettings {
+namespace ModSettings.Patches {
 	internal static class CustomModePatches {
 
 		[HarmonyPatch(typeof(Panel_CustomXPSetup), "UpdateMenuNavigation")]
