@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using static ModSettings.AttributeFieldTypes;
+using static ModSettings.AttributeUtils.AttributeFieldTypes;
 
 namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class SliderAttribute : Attribute {
+	public sealed class SliderAttribute : SettingAttribute {
 
 		internal const string DefaultFloatFormat = "{0:F1}";
 		internal const string DefaultIntFormat = "{0:D}";
@@ -57,8 +57,8 @@ namespace ModSettings {
 			}
 
 			if (IsIntegerType(fieldType)) {
-				long minAsLong = (long) Math.Round(min);
-				long maxAsLong = (long) Math.Round(max);
+				long minAsLong = (long)Math.Round(min);
+				long maxAsLong = (long)Math.Round(max);
 
 				if (minAsLong < MinValue(fieldType))
 					throw new ArgumentException("[ModSettings] 'Slider' minimum value smaller than minimum value of " + fieldType.Name, field.Name);

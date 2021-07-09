@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ModSettings.Groups;
+using System.Collections.Generic;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ namespace ModSettings {
 			panel.m_ScrollPanelHeight = height;
 
 			ScrollbarThumbResizer thumbResizer = slider.GetComponent<ScrollbarThumbResizer>();
-			thumbResizer.SetNumSteps((int) panel.m_ScrollPanel.height, (int) height);
+			thumbResizer.SetNumSteps((int)panel.m_ScrollPanel.height, (int)height);
 
 			slider.value = Mathf.Clamp01(absoluteVal / Mathf.Max(1, panel.m_ScrollPanelHeight - viewHeight));
 			panel.OnScrollbarChange();
@@ -51,7 +52,7 @@ namespace ModSettings {
 		internal void NextSection() {
 			if (sections.Count == 0) {
 				if (afterLast) {
-					Debug.LogWarning("[ModSettings] Exhausted all GUI sections, skipping NextSection!");
+					MelonLoader.MelonLogger.Warning("Exhausted all GUI sections, skipping NextSection!");
 				}
 				afterLast = true;
 				return;
@@ -67,7 +68,7 @@ namespace ModSettings {
 					// It's a header, add some padding and shift to left
 					GameObject padding = NGUITools.AddChild(uiGrid.gameObject);
 					GameObject parent = NGUITools.AddChild(uiGrid.gameObject);
-					lastHeader = new Header(parent, padding);
+					lastHeader = new HeaderGroup(parent, padding);
 
 					element.parent = parent.transform;
 					element.localPosition = new Vector2(-70, 0);
@@ -88,7 +89,7 @@ namespace ModSettings {
 		internal void Finish() {
 			// Make sure that all sections have been added to the table
 			if (sections.Count > 0) {
-				Debug.LogWarning("[ModSettings] More GUI elements in queue!");
+				MelonLoader.MelonLogger.Warning("More GUI elements in queue!");
 				while (sections.Count > 0) {
 					NextSection();
 				}

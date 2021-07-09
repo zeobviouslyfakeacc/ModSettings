@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 using static CustomExperienceModeManager;
-using static ModSettings.AttributeFieldTypes;
+using static ModSettings.AttributeUtils.AttributeFieldTypes;
 
 namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class ChoiceAttribute : Attribute {
+	public sealed class ChoiceAttribute : SettingAttribute {
 
 		private static ChoiceAttribute Localized(params string[] names) => new ChoiceAttribute(names) { Localize = true };
 		private static readonly Dictionary<Type, ChoiceAttribute> predefinedHinterlandEnums = new Dictionary<Type, ChoiceAttribute>() {
@@ -19,7 +19,7 @@ namespace ModSettings {
 			{ typeof(CustomTunableNLMHV),              Localized("GAMEPLAY_None", "GAMEPLAY_Low", "GAMEPLAY_Medium", "GAMEPLAY_High", "GAMEPLAY_VeryHigh") },
 			{ typeof(CustomTunableTimeOfDay),          Localized("GAMEPLAY_Dawn", "GAMEPLAY_Noon", "GAMEPLAY_Dusk", "GAMEPLAY_Midnight", "GAMEPLAY_Random") },
 			{ typeof(CustomTunableWeather),            Localized("GAMEPLAY_WeatherClear", "GAMEPLAY_WeatherLightSnow", "GAMEPLAY_WeatherHeavySnow",
-			                                                     "GAMEPLAY_WeatherBlizzard", "GAMEPLAY_WeatherLightFog", "GAMEPLAY_WeatherHeavyFog", "GAMEPLAY_Random") }
+																 "GAMEPLAY_WeatherBlizzard", "GAMEPLAY_WeatherLightFog", "GAMEPLAY_WeatherHeavyFog", "GAMEPLAY_Random") }
 		};
 
 		internal static readonly ChoiceAttribute YesNoAttribute = Localized("GAMEPLAY_No", "GAMEPLAY_Yes");
@@ -90,10 +90,10 @@ namespace ModSettings {
 				throw new ArgumentException("[ModSettings] 'Choice' attribute must contain array of at least two elements", field.Name);
 			} else if (names.Length - 1 > typeMax) {
 				throw new ArgumentException("[ModSettings] 'Choice' attribute contains more elements than " + fieldType.Name
-				                            + " can represent: " + names.Length + " > " + (typeMax + 1), field.Name);
+											+ " can represent: " + names.Length + " > " + (typeMax + 1), field.Name);
 			} else if (enumType != null && names.Length != Enum.GetValues(enumType).Length)
 				throw new ArgumentException("[ModSettings] 'Choice' attribute array length doesn't match " + enumType.Name
-				                            + " enum value count: " + names.Length + " != " + Enum.GetValues(enumType).Length, field.Name);
+											+ " enum value count: " + names.Length + " != " + Enum.GetValues(enumType).Length, field.Name);
 
 			foreach (string name in names) {
 				if (string.IsNullOrEmpty(name))

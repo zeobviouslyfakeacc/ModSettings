@@ -1,9 +1,9 @@
-﻿using System;
-using Harmony;
+﻿using HarmonyLib;
+using System;
 using UnityEngine;
 using Il2Cpp = Il2CppSystem.Collections.Generic;
 
-namespace ModSettings {
+namespace ModSettings.Patches {
 	internal static class SliderFixPatches {
 
 		private const float MENU_DEADZONE = 0.05f;

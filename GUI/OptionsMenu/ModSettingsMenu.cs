@@ -11,6 +11,8 @@ namespace ModSettings {
 
 		private static ModSettingsGUI modSettingsGUI = null;
 
+		internal static bool disableMovementInput;
+
 		internal static void RegisterSettings(ModSettingsBase modSettings, string modName, MenuType menuType) {
 			if (string.IsNullOrEmpty(modName)) {
 				throw new ArgumentException("[ModSettings] Mod name must be a non-empty string", "modName");
@@ -35,7 +37,7 @@ namespace ModSettings {
 		}
 
 		internal static void BuildGUI() {
-			GameObject modSettingsTab = ModSettingsGUIBuilder.CreateModSettingsTab();
+			GameObject modSettingsTab = CreateModSettingsTab();
 			modSettingsGUI = modSettingsTab.AddComponent<ModSettingsGUI>();
 			modSettingsGUI.Build();
 
@@ -45,6 +47,22 @@ namespace ModSettings {
 					guiBuilder.AddSettings(modSettings);
 				}
 			}
+		}
+
+		internal static GameObject CreateModSettingsTab() {
+			Panel_OptionsMenu panel = InterfaceManager.m_Panel_OptionsMenu;
+			Transform pages = panel.transform.Find("Pages");
+			GameObject tab = UnityEngine.Object.Instantiate(panel.m_QualityTab, pages);
+			tab.name = "ModSettings";
+
+			Transform titleLabel = tab.transform.Find("TitleDisplay/Label");
+			UnityEngine.Object.Destroy(titleLabel.GetComponent<UILocalize>());
+			titleLabel.GetComponent<UILabel>().text = "Mod Settings";
+
+			panel.m_MainMenuItemTabs.Add(tab);
+			panel.m_Tabs.Add(tab);
+
+			return tab;
 		}
 
 		internal static void SetSettingsVisible(bool isMainMenu, bool visible) {
