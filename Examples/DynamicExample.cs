@@ -7,7 +7,6 @@ namespace ModSettings.Examples {
 	internal class DynamicSettings : ModSettingsBase {
 		private const int NUM_FIBONACCI = 20;
 
-		[HideFromModSettings]
 		public KeyCode keyCode = KeyCode.Y;
 
 		[Name("Yes / No choice")]
@@ -43,7 +42,6 @@ namespace ModSettings.Examples {
 		[Name("Slider for an int with no slider attribute")]
 		public int defaultIntSlider = 0;
 
-		[HideFromModSettings]
 		public string textBox1 = "Text Box 1";
 
 		[Name("Text Box 2")]

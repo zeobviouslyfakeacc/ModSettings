@@ -13,10 +13,8 @@ namespace ModSettings.Examples {
 		[Display]
 		public string sign = "Dont Know";
 
-		[HideFromModSettings]
 		public int num1 = 0;
 
-		[HideFromModSettings]
 		public int num2 = 0;
 
 		internal override void MakeGUIContents(GUIBuilder guiBuilder) {

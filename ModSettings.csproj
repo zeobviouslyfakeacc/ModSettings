@@ -60,7 +60,6 @@
     <Compile Include="Attributes\ChoiceAttribute.cs" />
     <Compile Include="Attributes\DescriptionAttribute.cs" />
     <Compile Include="Attributes\DisplayAttribute.cs" />
-    <Compile Include="Attributes\HideFromModSettingsAttribute.cs" />
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\SectionAttribute.cs" />
     <Compile Include="Attributes\SettingAttribute.cs" />
@@ -76,6 +75,8 @@
     <Compile Include="Extentions\GameObjectExtensions.cs" />
     <Compile Include="Groups\HeaderGroup.cs" />
     <Compile Include="Groups\MenuGroup.cs" />
+    <Compile Include="GUI\Settings\Setting.cs" />
+    <Compile Include="GUI\VirtualGUIBuilder.cs" />
     <Compile Include="Scripts\TextBoxHandler.cs" />
     <Compile Include="Scripts\CustomKeybinding.cs" />
     <Compile Include="GUI\CustomMode\CustomModeGUIBuilder.cs" />

@@ -56,29 +56,24 @@ namespace ModSettings {
 			ModSettingsMenu.RegisterSettings(this, modName, menuType);
 		}
 
-		internal virtual void MakeGUIContents(GUIBuilder guiBuilder) {
+		internal void MakeGUIContents(VirtualGUIBuilder guiBuilder) {
 			foreach (FieldInfo field in this.GetFields()) {
-				if (AttributeScraper.HasAttribute<HideFromModSettingsAttribute>(field))
-					continue;
-
 				AttributeScraper.GetAttributes(field, out SectionAttribute section, out NameAttribute name, out DescriptionAttribute description,
 						out SliderAttribute slider, out ChoiceAttribute choice, out DisplayAttribute display, out TextBoxAttribute textBox);
 
 				if (section != null) {
-					if (string.IsNullOrWhiteSpace(section.Title)) guiBuilder.AddPaddingHeader();
-					else guiBuilder.AddHeader(section);
-				} else if (guiBuilder.lastHeader == null)
-					guiBuilder.AddPaddingHeader();
+					guiBuilder.AddHeader(section);
+				}
 
-				if (slider != null)
+				if (slider != null) {
 					guiBuilder.AddSliderSetting(this, field, name, description, slider);
-				else if (choice != null)
+				} else if (choice != null) {
 					guiBuilder.AddChoiceSetting(this, field, name, description, choice);
-				else if (display != null)
+				} else if (display != null) {
 					guiBuilder.AddDisplaySetting(this, field, name, description);
-				else if (textBox != null)
+				} else if (textBox != null) {
 					guiBuilder.AddTextBoxSetting(this, field, name, description);
-				else {
+				} else {
 					// No Slider or Choice annotation, determine GUI object from field type
 					Type fieldType = field.FieldType;
 
