@@ -31,7 +31,7 @@ namespace ModSettings {
 
 		internal static void BuildGUI() {
 			guiBuilt = true;
-			CustomModeGUIBuilder guiBuilder = new CustomModeGUIBuilder(InterfaceManager.m_Panel_CustomXPSetup);
+			CustomModeGUIBuilder guiBuilder = new CustomModeGUIBuilder(InterfaceManager.LoadPanel<Panel_CustomXPSetup>());
 
 			for (int position = 0; position < numPositions; ++position) {
 				List<ModSettingsBase> settingsAtCurrentPos = settingsAtPosition[position];

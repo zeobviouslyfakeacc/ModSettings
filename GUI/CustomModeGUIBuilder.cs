@@ -51,7 +51,7 @@ namespace ModSettings {
 		internal void NextSection() {
 			if (sections.Count == 0) {
 				if (afterLast) {
-					Debug.LogWarning("[ModSettings] Exhausted all GUI sections, skipping NextSection!");
+					MelonLoader.MelonLogger.Warning("Exhausted all GUI sections, skipping NextSection!");
 				}
 				afterLast = true;
 				return;
@@ -88,7 +88,7 @@ namespace ModSettings {
 		internal void Finish() {
 			// Make sure that all sections have been added to the table
 			if (sections.Count > 0) {
-				Debug.LogWarning("[ModSettings] More GUI elements in queue!");
+				MelonLoader.MelonLogger.Warning("More GUI elements in queue!");
 				while (sections.Count > 0) {
 					NextSection();
 				}

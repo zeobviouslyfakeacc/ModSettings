@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using MelonLoader;
+using System.Collections.Generic;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using Il2Cpp = Il2CppSystem.Collections.Generic;
 
 namespace ModSettings {
+	[RegisterTypeInIl2Cpp]
 	internal class ModSettingsGUI : MonoBehaviour {
-
-		static ModSettingsGUI() {
-			UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<ModSettingsGUI>();
-		}
 
 		public ModSettingsGUI(System.IntPtr ptr) : base(ptr) { }
 
@@ -22,6 +20,8 @@ namespace ModSettings {
 		private Transform scrollPanelOffset;
 		private GameObject scrollBar;
 		private UISlider scrollBarSlider;
+
+		private void Awake() => Build();
 
 		[HideFromIl2Cpp]
 		internal void Build() {
@@ -87,7 +87,7 @@ namespace ModSettings {
 		[HideFromIl2Cpp]
 		private GameObject CreateScrollBar(UIPanel scrollPanel) {
 			// Terrible code in this method. I've given up trying to fix their scroll bar layout
-			Panel_CustomXPSetup xpModePanel = InterfaceManager.m_Panel_CustomXPSetup;
+			Panel_CustomXPSetup xpModePanel = InterfaceManager.LoadPanel<Panel_CustomXPSetup>();
 			GameObject scrollbarParent = xpModePanel.m_Scrollbar;
 			GameObject scrollbarPrefab = scrollbarParent.transform.GetChild(0).gameObject;
 			GameObject scrollbar = NGUITools.AddChild(gameObject, scrollbarPrefab);
@@ -196,8 +196,7 @@ namespace ModSettings {
 		}
 
 		private void OnEnable() {
-			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: true);
-
+			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuEnabled(), visible: true);
 			if (modSelector.items.Count > 0) {
 				modSelector.items.Sort();
 
@@ -208,7 +207,7 @@ namespace ModSettings {
 		}
 
 		private void OnDisable() {
-			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuActive(), visible: false);
+			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuEnabled(), visible: false);
 
 			previousMod = modSelector?.value;
 			foreach (ModTab tab in modTabs.Values) {

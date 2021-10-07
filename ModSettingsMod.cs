@@ -1,5 +1,4 @@
 ﻿using MelonLoader;
-using UnityEngine;
 
 namespace ModSettings {
 	internal class ModSettingsMod : MelonMod {
@@ -10,7 +9,6 @@ namespace ModSettings {
 			ModSettingsExample.OnChangeExample.OnLoad();
 			ModSettingsExample.VisibilityExample.OnLoad();
 #endif
-			Debug.Log($"[{Info.Name}] version {Info.Version} loaded!");
 		}
 	}
 }

@@ -114,7 +114,7 @@ namespace ModSettings {
 			try {
 				OnConfirm();
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnConfirm handler\n" + e.ToString());
+				MelonLoader.MelonLogger.Error("Exception in OnConfirm handler\n" + e.ToString());
 			}
 
 			foreach (FieldInfo field in fields) {
@@ -126,7 +126,7 @@ namespace ModSettings {
 			try {
 				OnChange(field, oldValue, newValue);
 			} catch (Exception e) {
-				UnityEngine.Debug.LogError("[ModSettings] Exception in OnChange handler\n" + e.ToString());
+				MelonLoader.MelonLogger.Error("Exception in OnChange handler\n" + e.ToString());
 			}
 		}
 
