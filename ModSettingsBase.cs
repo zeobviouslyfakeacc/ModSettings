@@ -150,12 +150,12 @@ namespace ModSettings {
 
 		private FieldInfo GetFieldForName(string fieldName) {
 			if (string.IsNullOrEmpty(fieldName)) {
-				throw new ArgumentException("Field name must be a non-empty string", "fieldName");
+				throw new ArgumentException("[ModSettings] Field name must be a non-empty string", "fieldName");
 			}
 
 			FieldInfo field = GetType().GetField(fieldName);
 			if (field == null) {
-				throw new ArgumentException("Could not find field with name " + fieldName, "fieldName");
+				throw new ArgumentException("[ModSettings] Could not find field with name " + fieldName, "fieldName");
 			}
 			return field;
 		}

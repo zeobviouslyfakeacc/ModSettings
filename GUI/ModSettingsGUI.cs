@@ -195,11 +195,9 @@ namespace ModSettings {
 			parentMenu.SetTabActive(gameObject);
 		}
 
-		private void OnEnable()
-		{
+		private void OnEnable() {
 			ModSettingsMenu.SetSettingsVisible(isMainMenu: InterfaceManager.IsMainMenuEnabled(), visible: true);
-			if (modSelector.items.Count > 0)
-			{
+			if (modSelector.items.Count > 0) {
 				modSelector.items.Sort();
 
 				string modToSelect = modSelector.items.Contains(previousMod) ? previousMod : modSelector.items[0];

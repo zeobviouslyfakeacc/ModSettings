@@ -39,7 +39,7 @@
     <Reference Include="Il2Cppmscorlib">
       <Private>False</Private>
     </Reference>
-    <Reference Include="MelonLoader, Version=0.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MelonLoader">
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

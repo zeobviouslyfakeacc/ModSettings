@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 
-namespace ModSettings
-{
-	internal static class ObjectPrefabs
-	{
+namespace ModSettings {
+	internal static class ObjectPrefabs {
 		internal static GameObject ComboBoxPrefab { get; private set; }
 		internal static GameObject CustomComboBoxPrefab { get; private set; }
 		internal static GameObject DisplayPrefab { get; private set; }
@@ -14,8 +12,7 @@ namespace ModSettings
 		internal static GameObject TextEntryPrefab { get; private set; }
 		private static bool isInitialized;
 
-		internal static void Initialize(Panel_OptionsMenu optionsPanel)
-		{
+		internal static void Initialize(Panel_OptionsMenu optionsPanel) {
 			if (isInitialized)
 				return;
 
@@ -55,15 +52,13 @@ namespace ModSettings
 			isInitialized = true;
 		}
 
-		private static GameObject MakeCustomComboBoxPrefab()
-		{
+		private static GameObject MakeCustomComboBoxPrefab() {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 			GameObject.DestroyImmediate(result.GetComponent<ConsoleComboBox>());
 			return result;
 		}
 
-		private static GameObject MakeDisplayPrefab()
-		{
+		private static GameObject MakeDisplayPrefab() {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
 			GameObject.DestroyImmediate(result.GetComponent<ConsoleComboBox>());
@@ -73,8 +68,7 @@ namespace ModSettings
 			return result;
 		}
 
-		private static GameObject MakeEmptyPrefab()
-		{
+		private static GameObject MakeEmptyPrefab() {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
 			GameObject.DestroyImmediate(result.GetComponent<ConsoleComboBox>());
@@ -85,8 +79,7 @@ namespace ModSettings
 			return result;
 		}
 
-		private static GameObject MakeKeyEntryPrefab(Panel_OptionsMenu optionsPanel)
-		{
+		private static GameObject MakeKeyEntryPrefab(Panel_OptionsMenu optionsPanel) {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
 			Transform rebindingTab = optionsPanel.m_RebindingTab.transform;
@@ -107,8 +100,7 @@ namespace ModSettings
 			return result;
 		}
 
-		private static GameObject MakeTextEntryPrefab()
-		{
+		private static GameObject MakeTextEntryPrefab() {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
 			GameObject originalTextBox = InterfaceManager.LoadPanel<Panel_Confirmation>().m_GenericMessageGroup?.m_InputField?.gameObject;
@@ -134,13 +126,11 @@ namespace ModSettings
 			return result;
 		}
 
-		private static GameObject GetChild(this GameObject parent, string childName)
-		{
+		private static GameObject GetChild(this GameObject parent, string childName) {
 			return parent?.transform?.FindChild(childName)?.gameObject;
 		}
 
-		private static void DestroyChild(this GameObject parent, string childName)
-		{
+		private static void DestroyChild(this GameObject parent, string childName) {
 			GameObject child = parent?.transform?.FindChild(childName)?.gameObject;
 			if (child) GameObject.DestroyImmediate(child);
 		}
