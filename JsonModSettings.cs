@@ -48,7 +48,7 @@ namespace ModSettings {
 				File.WriteAllText(jsonPath, json, Encoding.UTF8);
 				Debug.Log($"[{modName}] Config file saved to {jsonPath}");
 			} catch (Exception ex) {
-				Debug.LogError($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
+				MelonLoader.MelonLogger.Error($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace ModSettings {
 					confirmedValues[field] = field.GetValue(this);
 				}
 			} catch (Exception ex) {
-				Debug.LogError($"[{modName}] Error while trying to read config file {jsonPath}: {ex}");
+				MelonLoader.MelonLogger.Error($"[{modName}] Error while trying to read config file {jsonPath}: {ex}");
 
 				// Re-throw to make error show up in main menu
 				throw new IOException($"Error while trying to read config file {jsonPath}", ex);

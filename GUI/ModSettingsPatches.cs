@@ -1,5 +1,6 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
+using MelonLoader;
 using UnityEngine;
 
 namespace ModSettings {
@@ -10,33 +11,36 @@ namespace ModSettings {
 
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "InitializeAutosaveMenuItems", new Type[0])]
 		private static class BuildModSettingsGUIPatch {
-			private static void Postfix() {
+			private static void Postfix(Panel_OptionsMenu __instance) {
+				InterfaceManager.m_Panel_OptionsMenu = __instance;
+				ObjectPrefabs.Initialize(__instance);
+
 				DateTime tStart = DateTime.UtcNow;
 
 				try {
-					Debug.Log("[ModSettings] Building Mod Settings GUI");
+					MelonLogger.Msg("Building Mod Settings GUI");
 					ModSettingsMenu.BuildGUI();
 				} catch (Exception e) {
-					Debug.LogError("[ModSettings] Exception while building Mod Settings GUI\n" + e.ToString());
+					MelonLogger.Error("Exception while building Mod Settings GUI\n" + e.ToString());
 					return;
 				}
 				try {
-					Debug.Log("[ModSettings] Building Custom Mode GUI");
+					MelonLogger.Msg("Building Custom Mode GUI");
 					CustomModeMenu.BuildGUI();
 				} catch (Exception e) {
-					Debug.LogError("[ModSettings] Exception while building Custom Mode GUI\n" + e.ToString());
+					MelonLogger.Error("Exception while building Custom Mode GUI\n" + e.ToString());
 					return;
 				}
 
 				long timeMillis = (long) (DateTime.UtcNow - tStart).TotalMilliseconds;
-				Debug.Log("[ModSettings] Done! Took " + timeMillis + " ms. Have a nice day!");
+				MelonLogger.Msg("Done! Took " + timeMillis + " ms. Have a nice day!");
 			}
 		}
 
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "ConfigureMenu", new Type[0])]
 		private static class AddModSettingsButton {
 			private static void Postfix(Panel_OptionsMenu __instance) {
-				if (!ModSettingsMenu.HasVisibleModSettings(isMainMenu: InterfaceManager.IsMainMenuActive()))
+				if (!ModSettingsMenu.HasVisibleModSettings(isMainMenu: InterfaceManager.IsMainMenuEnabled()))
 					return;
 
 				BasicMenu basicMenu = __instance.m_BasicMenu;

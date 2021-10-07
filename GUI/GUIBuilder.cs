@@ -10,34 +10,6 @@ namespace ModSettings {
 
 		internal const int gridCellHeight = 33;
 
-		private static readonly GameObject headerLabelPrefab;
-		private static readonly GameObject sliderPrefab;
-		private static readonly GameObject comboBoxPrefab;
-		private static readonly GameObject keyEntryPrefab;
-
-		static GUIBuilder() {
-			Transform firstSection = InterfaceManager.m_Panel_CustomXPSetup.m_ScrollPanelOffsetTransform.GetChild(0);
-
-			headerLabelPrefab = UnityEngine.Object.Instantiate(firstSection.Find("Header").gameObject);
-			headerLabelPrefab.SetActive(false);
-
-			comboBoxPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_CustomXPSetup.m_AllowInteriorSpawnPopupList.gameObject);
-			comboBoxPrefab.SetActive(false);
-
-			keyEntryPrefab = MakeKeyEntryPrefab();
-			keyEntryPrefab.SetActive(false);
-
-			UnityEngine.Object.DestroyImmediate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.m_SliderObject.GetComponent<GenericSliderSpawner>());
-			sliderPrefab = UnityEngine.Object.Instantiate(InterfaceManager.m_Panel_OptionsMenu.m_FieldOfViewSlider.gameObject);
-			sliderPrefab.SetActive(false);
-			sliderPrefab.transform.Find("Label_FOV").localPosition = new Vector3(-10, 0, -1);
-
-			// Fix slider hitbox
-			BoxCollider collider = sliderPrefab.GetComponentInChildren<BoxCollider>();
-			collider.center = new Vector3(150, 0);
-			collider.size = new Vector3(900, 30);
-		}
-
 		protected readonly UIGrid uiGrid;
 		protected readonly Il2Cpp.List<GameObject> menuItems;
 
@@ -46,32 +18,6 @@ namespace ModSettings {
 		protected GUIBuilder(UIGrid uiGrid, Il2Cpp.List<GameObject> menuItems) {
 			this.uiGrid = uiGrid;
 			this.menuItems = menuItems;
-		}
-
-		private static GameObject MakeKeyEntryPrefab() {
-			GameObject result = GameObject.Instantiate(comboBoxPrefab);
-
-			Transform rebindingTab = InterfaceManager.m_Panel_OptionsMenu.m_RebindingTab.transform;
-			GameObject originalButton = rebindingTab?.FindChild("GameObject")?.FindChild("LeftSide")?.FindChild("Button_Rebinding")?.gameObject;
-			GameObject keybindingButton = GameObject.Instantiate(originalButton);
-
-			keybindingButton.transform.position = result.transform.FindChild("Label_Value").position;
-			keybindingButton.transform.parent = result.transform;
-			keybindingButton.name = "Keybinding_Button";
-
-			GameObject.DestroyImmediate(result.GetComponent<ConsoleComboBox>());
-			DestroyChild(result, "Button_Decrease");
-			DestroyChild(result, "Button_Increase");
-			DestroyChild(result, "Label_Value");
-
-			DestroyChild(keybindingButton, "Label_Name");
-
-			return result;
-		}
-
-		private static void DestroyChild(GameObject parent, string childName) {
-			GameObject child = parent?.transform?.FindChild(childName)?.gameObject;
-			if(child) GameObject.DestroyImmediate(child);
 		}
 
 		internal virtual void AddSettings(ModSettingsBase modSettings) {
@@ -117,7 +63,7 @@ namespace ModSettings {
 		private void AddHeader(SectionAttribute section) {
 			GameObject padding = NGUITools.AddChild(uiGrid.gameObject);
 			GameObject header = NGUITools.AddChild(uiGrid.gameObject);
-			GameObject label = NGUITools.AddChild(header, headerLabelPrefab);
+			GameObject label = NGUITools.AddChild(header, ObjectPrefabs.HeaderLabelPrefab);
 
 			label.SetActive(true);
 			label.transform.localPosition = new Vector2(-70, 0);
@@ -134,7 +80,7 @@ namespace ModSettings {
 
 		private void AddKeySetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description) {
 			// Create menu item
-			GameObject setting = CreateSetting(name, description, keyEntryPrefab, "Label");
+			GameObject setting = CreateSetting(name, description, ObjectPrefabs.KeyEntryPrefab, "Label");
 			GameObject keyButtonObject = setting.transform.FindChild("Keybinding_Button").gameObject;
 
 			CustomKeybinding customKeybinding = setting.AddComponent<CustomKeybinding>();
@@ -163,7 +109,7 @@ namespace ModSettings {
 
 		private void AddChoiceSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, ChoiceAttribute choice) {
 			// Create menu item
-			GameObject setting = CreateSetting(name, description, comboBoxPrefab, "Label");
+			GameObject setting = CreateSetting(name, description, ObjectPrefabs.ComboBoxPrefab, "Label");
 			ConsoleComboBox comboBox = setting.GetComponent<ConsoleComboBox>();
 
 			// Add selectable values
@@ -197,7 +143,7 @@ namespace ModSettings {
 
 		private void AddSliderSetting(ModSettingsBase modSettings, FieldInfo field, NameAttribute name, DescriptionAttribute description, SliderAttribute range) {
 			// Create menu
-			GameObject setting = CreateSetting(name, description, sliderPrefab, "Label_FOV");
+			GameObject setting = CreateSetting(name, description, ObjectPrefabs.SliderPrefab, "Label_FOV");
 			ConsoleSlider slider = setting.GetComponent<ConsoleSlider>();
 			UILabel uiLabel = slider.m_SliderObject.GetComponentInChildren<UILabel>();
 			UISlider uiSlider = slider.m_SliderObject.GetComponentInChildren<UISlider>();

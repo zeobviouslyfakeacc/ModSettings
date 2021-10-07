@@ -39,14 +39,11 @@
     <Reference Include="Il2Cppmscorlib">
       <Private>False</Private>
     </Reference>
-    <Reference Include="MelonLoader.ModHandler">
+    <Reference Include="MelonLoader, Version=0.4.3.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnhollowerBaseLib">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnhollowerRuntimeLib">
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
@@ -78,6 +75,7 @@
     <Compile Include="GUI\ModSettingsGUIBuilder.cs" />
     <Compile Include="GUI\ModSettingsPatches.cs" />
     <Compile Include="GUI\ModTab.cs" />
+    <Compile Include="GUI\ObjectPrefabs.cs" />
     <Compile Include="GUI\SliderFixPatches.cs" />
     <Compile Include="JsonModSettings.cs" />
     <Compile Include="MenuType.cs" />

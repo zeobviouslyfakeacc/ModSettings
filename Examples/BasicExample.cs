@@ -49,15 +49,15 @@ namespace ModSettingsExample {
 		 * You also don't need to override this method if you don't need it.
 		 */
 		protected override void OnConfirm() {
-			Debug.Log("Settings applied!");
-			Debug.Log("boolVal = " + boolVal);
-			Debug.Log("stringChoice = " + stringChoice);
-			Debug.Log("enumChoice = " + enumChoice);
-			Debug.Log("timeOfDayChoice = " + timeOfDayChoice);
-			Debug.Log("steplessSliderValue = " + steplessSliderValue);
-			Debug.Log("steppedSliderValue = " + steppedSliderValue);
-			Debug.Log("intSliderValue = " + intSliderValue);
-			Debug.Log("keyCode = " + keyCode.ToString());
+			MelonLoader.MelonLogger.Msg("Settings applied!");
+			MelonLoader.MelonLogger.Msg("boolVal = " + boolVal);
+			MelonLoader.MelonLogger.Msg("stringChoice = " + stringChoice);
+			MelonLoader.MelonLogger.Msg("enumChoice = " + enumChoice);
+			MelonLoader.MelonLogger.Msg("timeOfDayChoice = " + timeOfDayChoice);
+			MelonLoader.MelonLogger.Msg("steplessSliderValue = " + steplessSliderValue);
+			MelonLoader.MelonLogger.Msg("steppedSliderValue = " + steppedSliderValue);
+			MelonLoader.MelonLogger.Msg("intSliderValue = " + intSliderValue);
+			MelonLoader.MelonLogger.Msg("keyCode = " + keyCode.ToString());
 		}
 	}
 
