@@ -25,6 +25,17 @@ namespace ModSettings {
 			}
 		}
 
+		[HarmonyPatch(typeof(InterfaceManager), "TryDestroyPanel_Internal", new Type[] { typeof(Il2CppSystem.Type) })]
+		private static class PreventCustomModePanelDestruction {
+			private static bool Prefix(Il2CppSystem.Type panelType, ref bool __result) {
+				if (panelType == UnhollowerRuntimeLib.Il2CppType.Of<Panel_CustomXPSetup>()) {
+					__result = false;
+					return false;
+				}
+				return true;
+			}
+		}
+
 		[HarmonyPatch(typeof(Panel_CustomXPSetup), "DoScroll")]
 		private static class CustomModeAbsoluteValueScrollPatch {
 			private static void Prefix(Panel_CustomXPSetup __instance, ref float scrollAmount) {
