@@ -8,8 +8,6 @@ using UnityEngine;
 namespace ModSettings {
 	public abstract class JsonModSettings : ModSettingsBase {
 
-		private static readonly string MODS_DIRECTORY = Path.GetFullPath(typeof(MelonLoader.MelonMod).Assembly.Location + @"\..\..\Mods");
-
 		protected readonly string modName;
 		protected readonly string jsonPath;
 
@@ -35,7 +33,7 @@ namespace ModSettings {
 				relativePath += ".json";
 			}
 
-			return Path.Combine(MODS_DIRECTORY, relativePath);
+			return Path.Combine(MelonLoader.MelonHandler.ModsDirectory, relativePath);
 		}
 
 		protected override void OnConfirm() {
