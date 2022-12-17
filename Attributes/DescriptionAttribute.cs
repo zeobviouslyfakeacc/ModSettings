@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ModSettings {
+﻿namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 	public sealed class DescriptionAttribute : Attribute {
 		private string description;

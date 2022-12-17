@@ -1,7 +1,8 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
-using Il2Cpp = Il2CppSystem.Collections.Generic;
+using Il2Cpp_ = Il2CppSystem.Collections.Generic;
+using Il2Cpp;
+using Il2CppInterop.Runtime.Injection;
 
 namespace ModSettings {
 	internal static class SliderFixPatches {
@@ -12,7 +13,7 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "UpdateMenuNavigationGeneric")]
 		private static class DisableTimerForSteplessSliderMove {
 
-			private static void Postfix(ref int index, Il2Cpp.List<GameObject> menuItems) {
+			private static void Postfix(ref int index, Il2Cpp_.List<GameObject> menuItems) {
 				ConsoleSlider slider = menuItems[index]?.GetComponentInChildren<ConsoleSlider>();
 				if (slider == null || slider.m_Slider == null || slider.m_Slider.numberOfSteps > 1)
 					return; // Not a stepless slider
@@ -30,7 +31,7 @@ namespace ModSettings {
 
 			private static void Postfix(Panel_CustomXPSetup __instance) {
 				int selectedIndex = __instance.m_CustomXPSelectedButtonIndex;
-				Il2Cpp.List<GameObject> menuItems = __instance.m_CustomXPMenuItemOrder;
+                Il2Cpp_.List<GameObject> menuItems = __instance.m_CustomXPMenuItemOrder;
 
 				ConsoleSlider slider = menuItems[selectedIndex].GetComponentInChildren<ConsoleSlider>();
 				if (!slider || !slider.m_Slider)
@@ -92,11 +93,11 @@ namespace ModSettings {
 		}
 
 		private static float GetTimeredMenuInputHorizontal() {
-			return InterfaceManager.m_Panel_OptionsMenu.GetGenericSliderMovementHorizontal();
+			return InterfaceManager.GetPanel<Panel_OptionsMenu>().GetGenericSliderMovementHorizontal();
 		}
 
 		private static float GetRawMenuInputHorizontal() {
-			Panel_OptionsMenu options = InterfaceManager.m_Panel_OptionsMenu;
+			Panel_OptionsMenu options = InterfaceManager.GetPanel<Panel_OptionsMenu>();
 			float origDeadzone = InputSystemRewired.m_MenuNavigationDeadzone;
 			InputSystemRewired.m_MenuNavigationDeadzone = MENU_DEADZONE;
 			float result = InputManager.GetMenuNavigationPrimary(options).x + InputManager.GetMenuNavigationSecondary(options).x;
@@ -107,7 +108,7 @@ namespace ModSettings {
 		internal class SliderBarDepthFixer : MonoBehaviour {
 
 			static SliderBarDepthFixer() {
-				UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<SliderBarDepthFixer>();
+				ClassInjector.RegisterTypeInIl2Cpp<SliderBarDepthFixer>();
 			}
 			public SliderBarDepthFixer(IntPtr ptr) : base(ptr) { }
 

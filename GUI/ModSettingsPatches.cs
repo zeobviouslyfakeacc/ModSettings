@@ -1,7 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using MelonLoader;
 using UnityEngine;
+using Il2Cpp;
 
 namespace ModSettings {
 
@@ -12,14 +12,13 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "InitializeAutosaveMenuItems", new Type[0])]
 		private static class BuildModSettingsGUIPatch {
 			private static void Postfix(Panel_OptionsMenu __instance) {
-				InterfaceManager.m_Panel_OptionsMenu = __instance;
 				ObjectPrefabs.Initialize(__instance);
 
 				DateTime tStart = DateTime.UtcNow;
 
 				try {
 					MelonLogger.Msg("Building Mod Settings GUI");
-					ModSettingsMenu.BuildGUI();
+					ModSettingsMenu.BuildGUI(__instance);
 				} catch (Exception e) {
 					MelonLogger.Error("Exception while building Mod Settings GUI\n" + e.ToString());
 					return;

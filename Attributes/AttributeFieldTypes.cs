@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 
 namespace ModSettings {
 	internal static class AttributeFieldTypes {
