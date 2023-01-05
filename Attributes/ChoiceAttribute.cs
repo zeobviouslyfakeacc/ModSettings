@@ -24,7 +24,7 @@ namespace ModSettings {
 
 		internal static ChoiceAttribute ForEnumType(Type enumType) {
 			// Use predefined value names for Hinterland enums
-			if (predefinedHinterlandEnums.TryGetValue(enumType, out ChoiceAttribute predefined)) {
+			if (predefinedHinterlandEnums.TryGetValue(enumType, out ChoiceAttribute? predefined)) {
 				return predefined;
 			}
 

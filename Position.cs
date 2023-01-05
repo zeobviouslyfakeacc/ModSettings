@@ -18,14 +18,10 @@
 		public static readonly Position BelowWildlifeStruggle = new Position(7);
 		public static readonly Position BelowAll = new Position(7);
 
-		private readonly int index;
-
 		private Position(int index) {
-			this.index = index;
+			this.Index = index;
 		}
 
-		internal int Index {
-			get => index;
-		}
+		internal int Index { get; }
 	}
 }

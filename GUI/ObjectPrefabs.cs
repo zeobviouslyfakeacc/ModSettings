@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace ModSettings {
 	internal static class ObjectPrefabs {
+#nullable disable
 		internal static GameObject ComboBoxPrefab { get; private set; }
 		internal static GameObject CustomComboBoxPrefab { get; private set; }
 		internal static GameObject DisplayPrefab { get; private set; }
@@ -11,6 +12,7 @@ namespace ModSettings {
 		internal static GameObject KeyEntryPrefab { get; private set; }
 		internal static GameObject SliderPrefab { get; private set; }
 		internal static GameObject TextEntryPrefab { get; private set; }
+#nullable enable
 		private static bool isInitialized;
 
 		internal static void Initialize(Panel_OptionsMenu optionsPanel) {
@@ -84,7 +86,7 @@ namespace ModSettings {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
 			Transform rebindingTab = optionsPanel.m_RebindingTab.transform;
-			GameObject originalButton = rebindingTab?.FindChild("GameObject")?.FindChild("LeftSide")?.FindChild("Button_Rebinding")?.gameObject;
+			GameObject originalButton = rebindingTab.FindChild("GameObject").FindChild("LeftSide").FindChild("Button_Rebinding").gameObject;
 			GameObject keybindingButton = GameObject.Instantiate(originalButton);
 
 			keybindingButton.transform.position = result.transform.FindChild("Label_Value").position;
@@ -104,7 +106,7 @@ namespace ModSettings {
 		private static GameObject MakeTextEntryPrefab() {
 			GameObject result = GameObject.Instantiate(ComboBoxPrefab);
 
-			GameObject originalTextBox = InterfaceManager.LoadPanel<Panel_Confirmation>().m_GenericMessageGroup?.m_InputField?.gameObject;
+			GameObject originalTextBox = InterfaceManager.LoadPanel<Panel_Confirmation>().m_GenericMessageGroup.m_InputField.gameObject;
 			GameObject newTextBox = GameObject.Instantiate(originalTextBox);
 
 			newTextBox.transform.position = result.transform.FindChild("Label_Value").position;
@@ -128,12 +130,13 @@ namespace ModSettings {
 		}
 
 		private static GameObject GetChild(this GameObject parent, string childName) {
-			return parent?.transform?.FindChild(childName)?.gameObject;
+			return parent.transform.FindChild(childName).gameObject;
 		}
 
 		private static void DestroyChild(this GameObject parent, string childName) {
-			GameObject child = parent?.transform?.FindChild(childName)?.gameObject;
-			if (child) GameObject.DestroyImmediate(child);
+			GameObject? child = parent?.transform?.FindChild(childName)?.gameObject;
+			if (child != null)
+				GameObject.DestroyImmediate(child);
 		}
 	}
 }

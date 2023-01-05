@@ -4,7 +4,7 @@ namespace ModSettings {
 	public abstract class ModSettingsBase {
 
 		internal readonly FieldInfo[] fields;
-		internal readonly Dictionary<FieldInfo, object> confirmedValues;
+		internal readonly Dictionary<FieldInfo, object?> confirmedValues;
 		private readonly List<Action> refreshActions;
 
 		private readonly Visibility menuVisibility;
@@ -13,7 +13,7 @@ namespace ModSettings {
 
 		protected ModSettingsBase() {
 			fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
-			confirmedValues = new Dictionary<FieldInfo, object>(fields.Length);
+			confirmedValues = new Dictionary<FieldInfo, object?>(fields.Length);
 			refreshActions = new List<Action>();
 
 			menuVisibility = new Visibility();
@@ -97,7 +97,7 @@ namespace ModSettings {
 		}
 
 		internal void SetFieldValue(FieldInfo field, object newValue) {
-			object oldValue = field.GetValue(this);
+			object? oldValue = field.GetValue(this);
 			if (oldValue != newValue) {
 				field.SetValue(this, newValue);
 				CallOnChange(field, oldValue, newValue);
@@ -106,7 +106,7 @@ namespace ModSettings {
 
 		protected virtual void OnConfirm() { }
 
-		protected virtual void OnChange(FieldInfo field, object oldValue, object newValue) { }
+		protected virtual void OnChange(FieldInfo field, object? oldValue, object? newValue) { }
 
 		internal void CallOnConfirm() {
 			try {
@@ -120,7 +120,7 @@ namespace ModSettings {
 			}
 		}
 
-		internal void CallOnChange(FieldInfo field, object oldValue, object newValue) {
+		internal void CallOnChange(FieldInfo field, object? oldValue, object? newValue) {
 			try {
 				OnChange(field, oldValue, newValue);
 			} catch (Exception e) {
@@ -151,7 +151,7 @@ namespace ModSettings {
 				throw new ArgumentException("[ModSettings] Field name must be a non-empty string", "fieldName");
 			}
 
-			FieldInfo field = GetType().GetField(fieldName);
+			FieldInfo? field = GetType().GetField(fieldName);
 			if (field == null) {
 				throw new ArgumentException("[ModSettings] Could not find field with name " + fieldName, "fieldName");
 			}
@@ -162,7 +162,7 @@ namespace ModSettings {
 			if (field == null) {
 				throw new ArgumentNullException("field");
 			}
-			if (fieldVisibilities.TryGetValue(field, out Visibility visibility)) {
+			if (fieldVisibilities.TryGetValue(field, out Visibility? visibility)) {
 				return visibility;
 			} else {
 				throw new ArgumentException("Field " + field.Name + " not part of class " + GetType().Name, "field");
@@ -171,8 +171,8 @@ namespace ModSettings {
 
 		private class Visibility {
 
-			private readonly List<OnVisibilityChange> visibilityListeners = new List<OnVisibilityChange>();
-			private readonly List<Visibility> children = new List<Visibility>();
+			private readonly List<OnVisibilityChange> visibilityListeners = new();
+			private readonly List<Visibility> children = new();
 			private bool parentVisible = true;
 			private bool visible = true;
 

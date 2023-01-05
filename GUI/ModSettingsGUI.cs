@@ -10,16 +10,18 @@ namespace ModSettings {
 
 		public ModSettingsGUI(System.IntPtr ptr) : base(ptr) { }
 
-		private readonly Dictionary<string, ModTab> modTabs = new Dictionary<string, ModTab>();
-		private ModTab currentTab = null;
+		private readonly Dictionary<string, ModTab> modTabs = new();
+		private ModTab? currentTab = null;
 		private int selectedIndex = 0;
-		private string previousMod = null;
+		private string? previousMod = null;
 
+#nullable disable
 		private ConsoleComboBox modSelector;
 		private UIPanel scrollPanel;
 		private Transform scrollPanelOffset;
 		private GameObject scrollBar;
 		private UISlider scrollBarSlider;
+#nullable enable
 
 		private void Awake() => Build();
 
@@ -152,7 +154,7 @@ namespace ModSettings {
 
 		[HideFromIl2Cpp]
 		private void UpdateDescriptionLabel() {
-			GameObject setting = currentTab.menuItems[selectedIndex];
+			GameObject setting = currentTab!.menuItems[selectedIndex];
 			DescriptionHolder description = setting.GetComponent<DescriptionHolder>();
 
 			if (description == null)
@@ -175,7 +177,7 @@ namespace ModSettings {
 				return;
 			}
 
-			GameObject setting = currentTab.menuItems[selectedIndex];
+			GameObject setting = currentTab!.menuItems[selectedIndex];
 			float settingY = -setting.transform.localPosition.y;
 			float scrollPanelTop = scrollPanelOffset.localPosition.y + GUIBuilder.gridCellHeight;
 			float scrollPanelBottom = scrollPanelOffset.localPosition.y + scrollPanel.height - GUIBuilder.gridCellHeight;
@@ -200,7 +202,7 @@ namespace ModSettings {
 			if (modSelector.items.Count > 0) {
 				modSelector.items.Sort();
 
-				string modToSelect = modSelector.items.Contains(previousMod) ? previousMod : modSelector.items[0];
+				string modToSelect = previousMod != null && modSelector.items.Contains(previousMod) ? previousMod : modSelector.items[0];
 				modSelector.value = modToSelect;
 				SelectMod(modToSelect);
 			}
@@ -295,7 +297,7 @@ namespace ModSettings {
 				modTab.scrollBarHeight = childCount * GUIBuilder.gridCellHeight - scrollPanel.height;
 			}
 
-			scrollBar.SetActive(currentTab.scrollBarHeight > 0);
+			scrollBar.SetActive(currentTab?.scrollBarHeight > 0);
 		}
 	}
 }

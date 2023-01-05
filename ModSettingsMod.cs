@@ -3,7 +3,7 @@
 namespace ModSettings {
 	internal class ModSettingsMod : MelonMod {
 
-		public override void OnApplicationStart() {
+		public override void OnInitializeMelon() {
 #if DEBUG
 			ModSettingsExample.BasicExample.OnLoad();
 			ModSettingsExample.OnChangeExample.OnLoad();

@@ -155,7 +155,7 @@ namespace ModSettings {
 			if (numberOfSteps < 0) {
 				numberOfSteps = isFloat ? 1 : Mathf.RoundToInt(Mathf.Abs(from - to)) + 1;
 			}
-			string numberFormat = range.NumberFormat;
+			string? numberFormat = range.NumberFormat;
 			if (string.IsNullOrEmpty(numberFormat)) {
 				numberFormat = isFloat ? SliderAttribute.DefaultFloatFormat : SliderAttribute.DefaultIntFormat;
 			}

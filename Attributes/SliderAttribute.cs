@@ -13,7 +13,7 @@ namespace ModSettings {
 		private readonly float from;
 		private readonly float to;
 		private readonly int numberOfSteps;
-		private string numberFormat = null;
+		private string? numberFormat = null;
 
 		public SliderAttribute(float from, float to) : this(from, to, -1) { }
 
@@ -35,7 +35,7 @@ namespace ModSettings {
 			get => numberOfSteps;
 		}
 
-		public string NumberFormat {
+		public string? NumberFormat {
 			get => numberFormat;
 			set => numberFormat = value;
 		}

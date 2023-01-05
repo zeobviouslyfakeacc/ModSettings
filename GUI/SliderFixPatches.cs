@@ -14,7 +14,7 @@ namespace ModSettings {
 		private static class DisableTimerForSteplessSliderMove {
 
 			private static void Postfix(ref int index, Il2CppCollections.List<GameObject> menuItems) {
-				ConsoleSlider slider = menuItems[index]?.GetComponentInChildren<ConsoleSlider>();
+				ConsoleSlider? slider = menuItems[index]?.GetComponentInChildren<ConsoleSlider>();
 				if (slider == null || slider.m_Slider == null || slider.m_Slider.numberOfSteps > 1)
 					return; // Not a stepless slider
 

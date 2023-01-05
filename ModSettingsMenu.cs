@@ -8,7 +8,7 @@ namespace ModSettings {
 		private static readonly HashSet<ModSettingsBase> inGameSettings = new HashSet<ModSettingsBase>();
 		private static readonly SortedDictionary<string, List<ModSettingsBase>> settingsByModName = new SortedDictionary<string, List<ModSettingsBase>>();
 
-		private static ModSettingsGUI modSettingsGUI = null;
+		private static ModSettingsGUI? modSettingsGUI = null;
 
 		internal static void RegisterSettings(ModSettingsBase modSettings, string modName, MenuType menuType) {
 			if (string.IsNullOrEmpty(modName)) {
@@ -25,7 +25,7 @@ namespace ModSettings {
 			if (menuType != MenuType.MainMenuOnly)
 				inGameSettings.Add(modSettings);
 
-			if (settingsByModName.TryGetValue(modName, out List<ModSettingsBase> settingsList)) {
+			if (settingsByModName.TryGetValue(modName, out List<ModSettingsBase>? settingsList)) {
 				settingsList.Add(modSettings);
 			} else {
 				settingsList = new List<ModSettingsBase> { modSettings };

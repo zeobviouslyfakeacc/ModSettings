@@ -20,12 +20,6 @@ namespace ModSettings {
 			}
 		}
 
-		internal string Text {
-			[HideFromIl2Cpp]
-			get;
-
-			[HideFromIl2Cpp]
-			private set;
-		}
+		internal string Text { [HideFromIl2Cpp] get; [HideFromIl2Cpp] private set; } = "";
 	}
 }

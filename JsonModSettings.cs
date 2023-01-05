@@ -1,4 +1,6 @@
-﻿using MelonLoader.TinyJSON;
+﻿using MelonLoader;
+using MelonLoader.TinyJSON;
+using MelonLoader.Utils;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
@@ -12,8 +14,8 @@ namespace ModSettings {
 		public JsonModSettings() : this(null) {
 		}
 
-		public JsonModSettings(string relativeJsonFilePath) {
-			modName = GetType().Assembly.GetName().Name;
+		public JsonModSettings(string? relativeJsonFilePath) {
+			modName = GetType().Assembly.GetName().Name!;
 			jsonPath = ToAbsoluteJsonPath(relativeJsonFilePath ?? modName);
 			LoadOrCreate();
 		}
@@ -31,7 +33,7 @@ namespace ModSettings {
 				relativePath += ".json";
 			}
 
-			return Path.Combine(MelonLoader.MelonHandler.ModsDirectory, relativePath);
+			return Path.Combine(MelonEnvironment.ModsDirectory, relativePath);
 		}
 
 		protected override void OnConfirm() {
@@ -44,7 +46,7 @@ namespace ModSettings {
 				File.WriteAllText(jsonPath, json, Encoding.UTF8);
 				Debug.Log($"[{modName}] Config file saved to {jsonPath}");
 			} catch (Exception ex) {
-				MelonLoader.MelonLogger.Error($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
+				new MelonLogger.Instance(modName).Error($"[{modName}] Error while trying to write config file {jsonPath}: {ex}");
 			}
 		}
 
@@ -52,7 +54,7 @@ namespace ModSettings {
 			try {
 				string json = File.ReadAllText(jsonPath, Encoding.UTF8);
 				Variant parsed = JSON.Load(json);
-				MethodInfo populateMethod = typeof(JSON).GetMethod("Populate").MakeGenericMethod(GetType());
+				MethodInfo populateMethod = typeof(JSON).GetMethod(nameof(JSON.Populate))!.MakeGenericMethod(GetType());
 				populateMethod.Invoke(null, new object[] { parsed, this });
 
 				foreach (FieldInfo field in fields) {
