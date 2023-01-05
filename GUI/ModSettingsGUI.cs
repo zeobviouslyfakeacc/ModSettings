@@ -226,7 +226,14 @@ namespace ModSettings {
 
 		[HideFromIl2Cpp]
 		private void SetConfirmButtonVisible(bool value) {
-			InterfaceManager.GetPanel<Panel_OptionsMenu>().m_SettingsNeedConfirmation = value;
+			Panel_OptionsMenu? optionsMenuPanel = InterfaceManager.GetPanel<Panel_OptionsMenu>();
+			if (optionsMenuPanel == null) {
+				if (value == true) {
+					throw new NullReferenceException($"Could not get {nameof(Panel_OptionsMenu)}");
+				}
+			} else {
+				optionsMenuPanel.m_SettingsNeedConfirmation = value;
+			}
 		}
 
 		[HideFromIl2Cpp]
