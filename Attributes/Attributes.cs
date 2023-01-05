@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using static ModSettings.AttributeFieldTypes;
 
 namespace ModSettings {

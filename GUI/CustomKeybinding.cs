@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
-using UnhollowerBaseLib.Attributes;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Attributes;
+using Il2Cpp;
 
 namespace ModSettings {
 	internal class CustomKeybinding : MonoBehaviour {
-		static CustomKeybinding() => UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<CustomKeybinding>();
+		static CustomKeybinding() => ClassInjector.RegisterTypeInIl2Cpp<CustomKeybinding>();
 		public CustomKeybinding(System.IntPtr intPtr) : base(intPtr) { }
 
 		internal KeyCode currentKeycodeSetting = KeyCode.None;

@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using UnityEngine;
+using Il2Cpp;
+using MelonLoader;
 
 namespace ModSettings {
 
 	internal class ModSettingsGUIBuilder : GUIBuilder {
 
-		internal static GameObject CreateModSettingsTab() {
-			Panel_OptionsMenu panel = InterfaceManager.m_Panel_OptionsMenu;
+		internal static GameObject CreateModSettingsTab(Panel_OptionsMenu panel)
+        {
 			Transform pages = panel.transform.Find("Pages");
-			GameObject tab = Object.Instantiate(panel.m_QualityTab, pages);
+			GameObject tab = UnityEngine.Object.Instantiate(panel.m_QualityTab, pages);
 			tab.name = "ModSettings";
 
 			Transform titleLabel = tab.transform.Find("TitleDisplay/Label");
-			Object.Destroy(titleLabel.GetComponent<UILocalize>());
+            UnityEngine.Object.Destroy(titleLabel.GetComponent<UILocalize>());
 			titleLabel.GetComponent<UILabel>().text = "Mod Settings";
 
 			panel.m_MainMenuItemTabs.Add(tab);

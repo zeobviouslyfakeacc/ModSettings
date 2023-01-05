@@ -1,11 +1,13 @@
-﻿using UnhollowerBaseLib.Attributes;
+﻿using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Attributes;
+using Il2Cpp;
 using UnityEngine;
 
 namespace ModSettings {
 	internal class DescriptionHolder : MonoBehaviour {
 
 		static DescriptionHolder() {
-			UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<DescriptionHolder>();
+			ClassInjector.RegisterTypeInIl2Cpp<DescriptionHolder>();
 		}
 		public DescriptionHolder(System.IntPtr ptr) : base(ptr) { }
 

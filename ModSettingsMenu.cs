@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MelonLoader;
 using UnityEngine;
+using Il2Cpp;
 
 namespace ModSettings {
 	internal static class ModSettingsMenu {
@@ -34,8 +34,8 @@ namespace ModSettings {
 			}
 		}
 
-		internal static void BuildGUI() {
-			GameObject modSettingsTab = ModSettingsGUIBuilder.CreateModSettingsTab();
+		internal static void BuildGUI(Panel_OptionsMenu panel) {
+			GameObject modSettingsTab = ModSettingsGUIBuilder.CreateModSettingsTab(panel);
 			modSettingsGUI = modSettingsTab.AddComponent<ModSettingsGUI>();
 
 			foreach (KeyValuePair<string, List<ModSettingsBase>> entry in settingsByModName) {

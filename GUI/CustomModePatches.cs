@@ -1,6 +1,8 @@
 ﻿using System;
 using HarmonyLib;
 using UnityEngine;
+using Il2Cpp;
+using Il2CppInterop.Runtime;
 
 namespace ModSettings {
 	internal static class CustomModePatches {
@@ -28,7 +30,7 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(InterfaceManager), "TryDestroyPanel_Internal", new Type[] { typeof(Il2CppSystem.Type) })]
 		private static class PreventCustomModePanelDestruction {
 			private static bool Prefix(Il2CppSystem.Type panelType, ref bool __result) {
-				if (panelType == UnhollowerRuntimeLib.Il2CppType.Of<Panel_CustomXPSetup>()) {
+				if (panelType == Il2CppType.Of<Panel_CustomXPSetup>()) {
 					__result = false;
 					return false;
 				}

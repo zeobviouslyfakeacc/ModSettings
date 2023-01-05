@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Il2Cpp;
 
 namespace ModSettings {
 	internal static class CustomModeMenu {

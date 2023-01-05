@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using UnhollowerBaseLib.Attributes;
-using UnityEngine;
+﻿using UnityEngine;
+using Il2Cpp;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Attributes;
+
 
 namespace ModSettings {
 	internal class CustomModeGUIBuilder : GUIBuilder {
@@ -82,7 +84,7 @@ namespace ModSettings {
 				}
 			}
 
-			Object.Destroy(section.gameObject);
+            UnityEngine.Object.Destroy(section.gameObject);
 		}
 
 		internal void Finish() {
@@ -98,7 +100,7 @@ namespace ModSettings {
 		internal class HinterlandSettingVisibilityListener : MonoBehaviour {
 
 			static HinterlandSettingVisibilityListener() {
-				UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<HinterlandSettingVisibilityListener>();
+				ClassInjector.RegisterTypeInIl2Cpp<HinterlandSettingVisibilityListener>();
 			}
 			public HinterlandSettingVisibilityListener(System.IntPtr ptr) : base(ptr) { }
 

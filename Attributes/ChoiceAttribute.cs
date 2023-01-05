@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using static CustomExperienceModeManager;
+﻿using System.Reflection;
 using static ModSettings.AttributeFieldTypes;
+using Il2CppTLD.Gameplay.Tunable;
 
 namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]

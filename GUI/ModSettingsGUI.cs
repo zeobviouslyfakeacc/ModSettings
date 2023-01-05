@@ -1,8 +1,9 @@
 ﻿using MelonLoader;
-using System.Collections.Generic;
-using UnhollowerBaseLib.Attributes;
 using UnityEngine;
-using Il2Cpp = Il2CppSystem.Collections.Generic;
+using Il2Cpp_ = Il2CppSystem.Collections.Generic;
+using Il2Cpp;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace ModSettings {
 	[RegisterTypeInIl2Cpp]
@@ -108,17 +109,17 @@ namespace ModSettings {
 		private void Update() {
 			if (currentTab == null)
 				return;
-			if (InputManager.GetEscapePressed(InterfaceManager.m_Panel_OptionsMenu)) {
-				InterfaceManager.m_Panel_OptionsMenu.OnCancel();
+			if (InputManager.GetEscapePressed(InterfaceManager.GetPanel<Panel_OptionsMenu>())) {
+				InterfaceManager.GetPanel<Panel_OptionsMenu>().OnCancel();
 				return;
 			}
 
-			InterfaceManager.m_Panel_OptionsMenu.UpdateMenuNavigationGeneric(ref selectedIndex, currentTab.menuItems);
+			InterfaceManager.GetPanel<Panel_OptionsMenu>().UpdateMenuNavigationGeneric(ref selectedIndex, currentTab.menuItems);
 			EnsureSelectedSettingVisible();
 			UpdateDescriptionLabel();
 
 			if (currentTab.scrollBarHeight > 0) {
-				float scroll = InputManager.GetAxisScrollWheel(InterfaceManager.m_Panel_OptionsMenu);
+				float scroll = InputManager.GetAxisScrollWheel(InterfaceManager.GetPanel<Panel_OptionsMenu>());
 				float scrollAmount = 60f / currentTab.scrollBarHeight;
 				if (scroll < 0) {
 					scrollBarSlider.value += scrollAmount;
@@ -158,7 +159,7 @@ namespace ModSettings {
 			if (description == null)
 				return;
 
-			UILabel descriptionLabel = InterfaceManager.m_Panel_OptionsMenu.m_OptionDescriptionLabel;
+			UILabel descriptionLabel = InterfaceManager.GetPanel<Panel_OptionsMenu>().m_OptionDescriptionLabel;
 			descriptionLabel.text = description.Text;
 			descriptionLabel.transform.parent = setting.transform;
 			descriptionLabel.transform.localPosition = new Vector3(655, 0);
@@ -167,7 +168,7 @@ namespace ModSettings {
 
 		[HideFromIl2Cpp]
 		private void EnsureSelectedSettingVisible() {
-			if (Utils.GetMenuMovementVertical(InterfaceManager.m_Panel_OptionsMenu, true, false) == 0f)
+			if (Utils.GetMenuMovementVertical(InterfaceManager.GetPanel<Panel_OptionsMenu>(), true, false) == 0f)
 				return;
 
 			if (selectedIndex == 0) {
@@ -224,7 +225,7 @@ namespace ModSettings {
 
 		[HideFromIl2Cpp]
 		private void SetConfirmButtonVisible(bool value) {
-			InterfaceManager.m_Panel_OptionsMenu.m_SettingsNeedConfirmation = value;
+			InterfaceManager.GetPanel<Panel_OptionsMenu>().m_SettingsNeedConfirmation = value;
 		}
 
 		[HideFromIl2Cpp]
@@ -245,7 +246,7 @@ namespace ModSettings {
 		[HideFromIl2Cpp]
 		internal ModTab CreateModTab(string modName) {
 			UIGrid grid = CreateUIGrid(modName);
-			Il2Cpp.List<GameObject> menuItems = new Il2Cpp.List<GameObject>();
+			Il2Cpp_.List<GameObject> menuItems = new Il2Cpp_.List<GameObject>();
 			menuItems.Add(modSelector.gameObject);
 			ModTab modTab = new ModTab(grid, menuItems);
 

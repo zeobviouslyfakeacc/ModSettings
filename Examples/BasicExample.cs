@@ -1,6 +1,6 @@
 ﻿using ModSettings;
 using UnityEngine;
-using static CustomExperienceModeManager;
+using Il2CppTLD.Gameplay.Tunable;
 
 namespace ModSettingsExample {
 #if DEBUG // Change build profile to Debug to enable or Release to disable this example
