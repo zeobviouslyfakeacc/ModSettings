@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using UnityEngine;
 using static ModSettings.AttributeFieldTypes;
-using Il2Cpp_ = Il2CppSystem.Collections.Generic;
+using Il2CppCollections = Il2CppSystem.Collections.Generic;
 using Il2Cpp;
 
 namespace ModSettings {
@@ -10,11 +10,11 @@ namespace ModSettings {
 		internal const int gridCellHeight = 33;
 
 		protected readonly UIGrid uiGrid;
-		protected readonly Il2Cpp_.List<GameObject> menuItems;
+		protected readonly Il2CppCollections.List<GameObject> menuItems;
 
 		protected Header lastHeader;
 
-		protected GUIBuilder(UIGrid uiGrid, Il2Cpp_.List<GameObject> menuItems) {
+		protected GUIBuilder(UIGrid uiGrid, Il2CppCollections.List<GameObject> menuItems) {
 			this.uiGrid = uiGrid;
 			this.menuItems = menuItems;
 		}

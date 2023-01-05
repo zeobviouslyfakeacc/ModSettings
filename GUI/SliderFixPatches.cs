@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
-using Il2Cpp_ = Il2CppSystem.Collections.Generic;
+using Il2CppCollections = Il2CppSystem.Collections.Generic;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 
@@ -13,7 +13,7 @@ namespace ModSettings {
 		[HarmonyPatch(typeof(Panel_OptionsMenu), "UpdateMenuNavigationGeneric")]
 		private static class DisableTimerForSteplessSliderMove {
 
-			private static void Postfix(ref int index, Il2Cpp_.List<GameObject> menuItems) {
+			private static void Postfix(ref int index, Il2CppCollections.List<GameObject> menuItems) {
 				ConsoleSlider slider = menuItems[index]?.GetComponentInChildren<ConsoleSlider>();
 				if (slider == null || slider.m_Slider == null || slider.m_Slider.numberOfSteps > 1)
 					return; // Not a stepless slider
@@ -31,7 +31,7 @@ namespace ModSettings {
 
 			private static void Postfix(Panel_CustomXPSetup __instance) {
 				int selectedIndex = __instance.m_CustomXPSelectedButtonIndex;
-                Il2Cpp_.List<GameObject> menuItems = __instance.m_CustomXPMenuItemOrder;
+				Il2CppCollections.List<GameObject> menuItems = __instance.m_CustomXPMenuItemOrder;
 
 				ConsoleSlider slider = menuItems[selectedIndex].GetComponentInChildren<ConsoleSlider>();
 				if (!slider || !slider.m_Slider)

@@ -1,6 +1,6 @@
 ﻿using MelonLoader;
 using UnityEngine;
-using Il2Cpp_ = Il2CppSystem.Collections.Generic;
+using Il2CppCollections = Il2CppSystem.Collections.Generic;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.Attributes;
@@ -246,7 +246,7 @@ namespace ModSettings {
 		[HideFromIl2Cpp]
 		internal ModTab CreateModTab(string modName) {
 			UIGrid grid = CreateUIGrid(modName);
-			Il2Cpp_.List<GameObject> menuItems = new Il2Cpp_.List<GameObject>();
+			Il2CppCollections.List<GameObject> menuItems = new Il2CppCollections.List<GameObject>();
 			menuItems.Add(modSelector.gameObject);
 			ModTab modTab = new ModTab(grid, menuItems);
 
