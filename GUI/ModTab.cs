@@ -1,6 +1,6 @@
-﻿using Il2CppCollections = Il2CppSystem.Collections.Generic;
-using Il2Cpp;
+﻿using Il2Cpp;
 using UnityEngine;
+using Il2CppCollections = Il2CppSystem.Collections.Generic;
 
 namespace ModSettings {
 	internal class ModTab {

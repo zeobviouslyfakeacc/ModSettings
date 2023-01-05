@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Il2Cpp;
+﻿using Il2Cpp;
+using UnityEngine;
 
 namespace ModSettings {
 	internal static class ObjectPrefabs {

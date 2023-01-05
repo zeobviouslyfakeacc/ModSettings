@@ -1,8 +1,7 @@
-﻿using System;
-using HarmonyLib;
-using UnityEngine;
+﻿using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
+using UnityEngine;
 
 namespace ModSettings {
 	internal static class CustomModePatches {

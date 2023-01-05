@@ -1,9 +1,8 @@
-﻿using MelonLoader;
+﻿using Il2Cpp;
+using Il2CppInterop.Runtime.Attributes;
+using MelonLoader;
 using UnityEngine;
 using Il2CppCollections = Il2CppSystem.Collections.Generic;
-using Il2Cpp;
-using Il2CppInterop.Runtime.Injection;
-using Il2CppInterop.Runtime.Attributes;
 
 namespace ModSettings {
 	[RegisterTypeInIl2Cpp]

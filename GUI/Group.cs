@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ModSettings {
+﻿namespace ModSettings {
 	internal abstract class Group {
 
 		private int children;

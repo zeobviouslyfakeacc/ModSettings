@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using MelonLoader;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using MelonLoader;
 
 [assembly: AssemblyTitle("ModSettings")]
 [assembly: AssemblyDescription("")]

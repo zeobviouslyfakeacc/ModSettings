@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using Il2CppInterop.Runtime.Injection;
+﻿using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
-using Il2Cpp;
+using Il2CppInterop.Runtime.Injection;
+using UnityEngine;
 
 namespace ModSettings {
 	internal class CustomKeybinding : MonoBehaviour {

@@ -1,6 +1,5 @@
-﻿using MelonLoader;
+﻿using Il2Cpp;
 using UnityEngine;
-using Il2Cpp;
 
 namespace ModSettings {
 	internal static class ModSettingsMenu {

@@ -1,7 +1,6 @@
-﻿using System.Reflection;
+﻿using Il2Cpp;
+using System.Reflection;
 using UnityEngine;
-using Il2Cpp;
-using MelonLoader;
 
 namespace ModSettings {
 

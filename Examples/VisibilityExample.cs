@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using ModSettings;
+﻿using ModSettings;
+using System.Reflection;
 
 namespace ModSettingsExample {
 #if DEBUG // Change build profile to Debug to enable or Release to disable this example

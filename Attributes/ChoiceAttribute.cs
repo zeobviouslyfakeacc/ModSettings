@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using Il2CppTLD.Gameplay.Tunable;
+using System.Reflection;
 using static ModSettings.AttributeFieldTypes;
-using Il2CppTLD.Gameplay.Tunable;
 
 namespace ModSettings {
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]

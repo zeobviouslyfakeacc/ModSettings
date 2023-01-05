@@ -1,8 +1,8 @@
-﻿using System.Reflection;
+﻿using Il2Cpp;
+using System.Reflection;
 using UnityEngine;
 using static ModSettings.AttributeFieldTypes;
 using Il2CppCollections = Il2CppSystem.Collections.Generic;
-using Il2Cpp;
 
 namespace ModSettings {
 	internal abstract class GUIBuilder {

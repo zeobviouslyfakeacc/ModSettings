@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
+using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
-using Il2Cpp;
 
 namespace ModSettings {
 
