@@ -22,6 +22,25 @@
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
+	<!--This is for NuGet.-->
+	<PropertyGroup>
+		<Authors>ds5678</Authors>
+		<Version>1.9.0.0</Version>
+		<AssemblyVersion>1.9.0.0</AssemblyVersion>
+		<PackageId>ds5678.Modding.TLD.ModSettings</PackageId>
+		<PackageTags>MelonLoader modding TLD settings mod</PackageTags>
+		<RepositoryUrl>https://github.com/zeobviouslyfakeacc/ModSettings</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/zeobviouslyfakeacc/ModSettings</PackageProjectUrl>
+		<Description>Library for The Long Dark that lets other mods create their own mod settings and custom mode settings</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\ModSettings.xml</DocumentationFile>
+		<NoWarn>1591</NoWarn>
+	</PropertyGroup>
+
 	<!--This is the of packages that the mod references.-->
 	<ItemGroup>
 		<!--This package contains almost everything a person could possibly need to reference while modding.-->
